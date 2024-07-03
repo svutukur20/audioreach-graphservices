@@ -2711,6 +2711,140 @@ typedef struct ats_cmd_selected_client_db_reinit_req_t {
 /** \} */ /* end_addtogroup ATS_CMD_ONC_SELECTED_CLIENT_DB_REINIT */
 
 /* ---------------------------------------------------------------------------
+* ATS_CMD_ONC_SET_CAL_DATA_NON_PERSIST_2 Declarations and Documentation
+*-------------------------------------------------------------------------- */
+
+/** \addtogroup ATS_CMD_ONC_SET_CAL_DATA_NON_PERSIST_2
+\{ */
+
+/**
+ *    Sets non-persistent cal data to the AML heap. This overrides calibration data
+ *    retrieved from the acdb file when GSL querries for calibration data.
+ *
+ *    This data can also be persisted to the delta file by setting the
+ *    persist flag to true.
+ *
+ *    \param[in] cmd_id 
+ *        Command ID is ATS_CMD_ONC_SET_CAL_DATA_NON_PERSIST_2
+ *    \param[in] cmd
+ *        This is a pointer to AtsSetCalDataNonPersistReq
+ *    \param[in] cmd_size
+ *        This is the size of AtsSetCalDataNonPersistReq
+ *    \param[out] rsp
+ *        There is no input structure; set this to NULL.
+ *    \param[in] rsp_size
+ *        There is no input structure; set this to 0.
+ *
+ *    \return
+ *        - AR_EOK -- Command executed successfully.
+ *        - AR_EBADPARAM -- Invalid input parameters were provided.
+ *        - AR_EFAILED -- Command execution failed.
+ *
+ *    \sa ats_online_ioctl
+ */
+#define ATS_CMD_ONC_SET_CAL_DATA_NON_PERSIST_2 ATS_ONLINE_CMD_ID(25)
+
+typedef struct _ats_set_cal_data_non_persist_req_t AtsSetCalDataNonPersistReq;
+#include "acdb_begin_pack.h"
+struct _ats_set_cal_data_non_persist_req_t {
+    uint32_t should_persist;
+    uint32_t num_subgraphs;
+    uint32_t* subgraph_list;
+    AcdbGraphKeyVector cal_key_vector;
+}
+#include "acdb_end_pack.h"
+;
+
+/* ---------------------------------------------------------------------------
+* ATS_CMD_ONC_SET_CAL_DATA_PERSIST_2 Declarations and Documentation
+*-------------------------------------------------------------------------- */
+/** \addtogroup ATS_CMD_ONC_SET_CAL_DATA_PERSIST_2
+\{ */
+
+/**
+ *    Sets persistent cal data to the AML heap. This overrides calibration data
+ *    retrieved from the acdb file when GSL querries for calibration data.
+ *
+ *    This data can also be persisted to the delta file by setting the
+ *    persist flag to true.
+ *
+ *    \param[in] cmd_id 
+ *        Command ID is ATS_CMD_ONC_SET_CAL_DATA_PERSIST_2
+ *    \param[in] cmd
+ *        This is a pointer to AtsSetCalDataPersistReq
+ *    \param[in] cmd_size
+ *        This is the size of AtsSetCalDataPersistReq
+ *    \param[out] rsp
+ *        There is no input structure; set this to NULL.
+ *    \param[in] rsp_size
+ *        There is no input structure; set this to NULL.
+ *
+ *    \return
+ *        - AR_EOK -- Command executed successfully.
+ *        - AR_EBADPARAM -- Invalid input parameters were provided.
+ *        - AR_EFAILED -- Command execution failed.
+ *
+ *    \sa ats_online_ioctl
+ */
+#define ATS_CMD_ONC_SET_CAL_DATA_PERSIST_2 ATS_ONLINE_CMD_ID(26)
+
+typedef struct _ats_set_cal_data_persist_req_t AtsSetCalDataPersistReq;
+#include "acdb_begin_pack.h"
+struct _ats_set_cal_data_persist_req_t {
+    uint32_t should_persist;
+    uint32_t num_subgraphs;
+    uint32_t* subgraph_list;
+    AcdbGraphKeyVector cal_key_vector;
+}
+#include "acdb_end_pack.h"
+;
+
+/* ---------------------------------------------------------------------------
+* ATS_CMD_ONC_SET_TAG_DATA_2 Declarations and Documentation
+*-------------------------------------------------------------------------- */
+/** \addtogroup ATS_CMD_ONC_SET_TAG_DATA_2
+\{ */
+
+/**
+ *    Sets tag data to the AML heap. This overrides tag data
+ *    retrieved from the acdb file when GSL querries for tag data.
+ *
+ *    This data can also be persisted to the delta file by setting the
+ *    persist flag to true.
+ *
+ *    \param[in] cmd_id 
+ *        Command ID is ATS_CMD_ONC_SET_TAG_DATA_2
+ *    \param[in] cmd
+ *        This is a pointer to AtsSetTagDataReq
+ *    \param[in] cmd_size
+ *        This is the size of AtsSetTagDataReq
+ *    \param[out] rsp
+ *        There is no input structure; set this to NULL.
+ *    \param[in] rsp_size
+ *        There is no input structure; set this to NULL.
+ *
+ *    \return
+ *        - AR_EOK -- Command executed successfully.
+ *        - AR_EBADPARAM -- Invalid input parameters were provided.
+ *        - AR_EFAILED -- Command execution failed.
+ *
+ *    \sa ats_online_ioctl
+ */
+#define ATS_CMD_ONC_SET_TAG_DATA_2 ATS_ONLINE_CMD_ID(27)
+
+typedef struct _ats_set_tag_data_req_t AtsSetTagDataReq;
+#include "acdb_begin_pack.h"
+struct _ats_set_tag_data_req_t {
+    uint32_t should_persist;
+    uint32_t num_subgraphs;
+    uint32_t* subgraph_list;
+    uint32_t tag_id;
+    AcdbGraphKeyVector tag_key_vector;
+}
+#include "acdb_end_pack.h"
+;
+
+/* ---------------------------------------------------------------------------
 * API Definitions
 *-------------------------------------------------------------------------- */
 

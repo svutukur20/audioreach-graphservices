@@ -475,7 +475,70 @@ int32_t ats_onc_set_cal_data_non_persist(
         subgraph_param_data.data = &cmd_buf[offset];
     }
 
-    status = AtsCmdSetCalDataNonPersist(&ckv, &subgraph_param_data);
+    status = AtsCmdSetCalDataNonPersist(FALSE, &ckv, &subgraph_param_data);
+
+    return status;
+}
+
+/**
+* \brief
+* Set non-persistent calibration data to the ACDB SW Heap or the data files.
+*
+*
+* \sa ats_online_ioctl
+* \return 0 on success, non-zero on failure
+*/
+int32_t ats_onc_set_cal_data_non_persist_2(
+    uint8_t* cmd_buf,
+    uint32_t cmd_buf_size,
+    uint8_t* rsp_buf,
+    uint32_t rsp_buf_size,
+    uint32_t* rsp_buf_bytes_filled)
+
+{
+    __UNREFERENCED_PARAM(rsp_buf);
+    __UNREFERENCED_PARAM(rsp_buf_size);
+
+    int32_t status = AR_EOK;
+    uint32_t offset = 0;
+    uint32_t should_persist = 0;
+    AcdbGraphKeyVector ckv = { 0 };
+    AcdbSubgraphParamData subgraph_param_data = { 0 };
+
+    if (IsNull(cmd_buf) || cmd_buf_size == 0)
+    {
+        ATS_ERR("Error[%d]: The request recieved is empty.",
+            AR_EBADPARAM);
+        return AR_EBADPARAM;
+    }
+
+    *rsp_buf_bytes_filled = 0;
+    ATS_READ_SEEK_UI32(should_persist,
+        cmd_buf, offset);
+    ATS_READ_SEEK_UI32(subgraph_param_data.subgraph_id_list.count,
+        cmd_buf, offset);
+    subgraph_param_data.subgraph_id_list.list =
+        (uint32_t*)&cmd_buf[offset];
+    offset += subgraph_param_data.subgraph_id_list.count * sizeof(uint32_t);
+
+    ATS_READ_SEEK_UI32(ckv.num_keys, cmd_buf, offset);
+
+    if (ckv.num_keys)
+    {
+        ckv.graph_key_vector =
+            (AcdbKeyValuePair*)&cmd_buf[offset];
+        offset += ckv.num_keys
+            * 2UL * (uint32_t)sizeof(uint32_t);
+    }
+
+    ATS_READ_SEEK_UI32(subgraph_param_data.data_size, cmd_buf, offset);
+
+    if (subgraph_param_data.data_size)
+    {
+        subgraph_param_data.data = &cmd_buf[offset];
+    }
+
+    status = AtsCmdSetCalDataNonPersist((bool_t)should_persist, &ckv, &subgraph_param_data);
 
     return status;
 }
@@ -583,7 +646,70 @@ int32_t ats_onc_set_cal_data_persist(
         subgraph_param_data.data = &cmd_buf[offset];
     }
 
-    status = AtsCmdSetCalDataPersist(&ckv, &subgraph_param_data);
+    status = AtsCmdSetCalDataPersist(FALSE, &ckv, &subgraph_param_data);
+
+    return status;
+}
+
+/**
+* \brief
+* Set persistent calibration data to the ACDB SW Heap or the data files.
+*
+* This version alows enabling/disabling persisting the data to the delta file.
+* \sa ats_online_ioctl, ats_onc_set_cal_data_persist
+* \return 0 on success, non-zero on failure
+*/
+int32_t ats_onc_set_cal_data_persist_2(
+    uint8_t* cmd_buf,
+    uint32_t cmd_buf_size,
+    uint8_t* rsp_buf,
+    uint32_t rsp_buf_size,
+    uint32_t* rsp_buf_bytes_filled)
+
+{
+    __UNREFERENCED_PARAM(rsp_buf);
+    __UNREFERENCED_PARAM(rsp_buf_size);
+
+    int32_t status = AR_EOK;
+    uint32_t offset = 0;
+    uint32_t should_persist = 0;
+    AcdbGraphKeyVector ckv = { 0 };
+    AcdbSubgraphParamData subgraph_param_data = { 0 };
+
+    if (IsNull(cmd_buf) || cmd_buf_size == 0)
+    {
+        ATS_ERR("Error[%d]: The request recieved is empty.",
+            AR_EBADPARAM);
+        return AR_EBADPARAM;
+    }
+
+    *rsp_buf_bytes_filled = 0;
+    ATS_READ_SEEK_UI32(should_persist,
+        cmd_buf, offset);
+    ATS_READ_SEEK_UI32(subgraph_param_data.subgraph_id_list.count,
+        cmd_buf, offset);
+    subgraph_param_data.subgraph_id_list.list =
+        (uint32_t*)&cmd_buf[offset];
+    offset += subgraph_param_data.subgraph_id_list.count * sizeof(uint32_t);
+
+    ATS_READ_SEEK_UI32(ckv.num_keys, cmd_buf, offset);
+
+    if (ckv.num_keys)
+    {
+        ckv.graph_key_vector =
+            (AcdbKeyValuePair*)&cmd_buf[offset];
+        offset += ckv.num_keys
+            * 2UL * (uint32_t)sizeof(uint32_t);
+    }
+
+    ATS_READ_SEEK_UI32(subgraph_param_data.data_size, cmd_buf, offset);
+
+    if (subgraph_param_data.data_size)
+    {
+        subgraph_param_data.data = &cmd_buf[offset];
+    }
+
+    status = AtsCmdSetCalDataPersist((bool_t)should_persist, &ckv, &subgraph_param_data);
 
     return status;
 }
@@ -694,7 +820,72 @@ int32_t ats_onc_set_tag_data(
         subgraph_param_data.data = &cmd_buf[offset];
     }
 
-    status = AtsCmdSetTagData(&tag, &subgraph_param_data);
+    status = AtsCmdSetTagData(FALSE, &tag, &subgraph_param_data);
+
+    return status;
+}
+
+/**
+* \brief
+* Set tag data to the ACDB SW Heap or the delta file(s).
+* This version alows enabling/disabling persisting the data to the delta file.
+* \sa ats_online_ioctl, ats_onc_set_tag_data
+* 
+* \return 0 on success, non-zero on failure
+*/
+int32_t ats_onc_set_tag_data_2(
+    uint8_t* cmd_buf,
+    uint32_t cmd_buf_size,
+    uint8_t* rsp_buf,
+    uint32_t rsp_buf_size,
+    uint32_t* rsp_buf_bytes_filled)
+
+{
+    __UNREFERENCED_PARAM(rsp_buf);
+    __UNREFERENCED_PARAM(rsp_buf_size);
+
+    int32_t status = AR_EOK;
+    uint32_t offset = 0;
+    uint32_t should_persist = 0;
+    AcdbModuleTag tag = { 0 };
+    AcdbSubgraphParamData subgraph_param_data = { 0 };
+
+    if (IsNull(cmd_buf) || cmd_buf_size == 0)
+    {
+        ATS_ERR("Error[%d]: The request recieved is empty.",
+            AR_EBADPARAM);
+        return AR_EBADPARAM;
+    }
+
+    *rsp_buf_bytes_filled = 0;
+    ATS_READ_SEEK_UI32(should_persist,
+        cmd_buf, offset);
+    ATS_READ_SEEK_UI32(subgraph_param_data.subgraph_id_list.count,
+        cmd_buf, offset);
+    subgraph_param_data.subgraph_id_list.list =
+        (uint32_t*)&cmd_buf[offset];
+    offset += subgraph_param_data.subgraph_id_list.count * sizeof(uint32_t);
+
+    ATS_READ_SEEK_UI32(tag.tag_id, cmd_buf, offset);
+    ATS_READ_SEEK_UI32(tag.tag_key_vector.num_keys,
+        cmd_buf, offset);
+
+    if (tag.tag_key_vector.num_keys)
+    {
+        tag.tag_key_vector.graph_key_vector =
+            (AcdbKeyValuePair*)&cmd_buf[offset];
+        offset += tag.tag_key_vector.num_keys
+            * 2UL * (uint32_t)sizeof(uint32_t);
+    }
+
+    ATS_READ_SEEK_UI32(subgraph_param_data.data_size, cmd_buf, offset);
+
+    if (subgraph_param_data.data_size)
+    {
+        subgraph_param_data.data = &cmd_buf[offset];
+    }
+
+    status = AtsCmdSetTagData((bool_t)should_persist, &tag, &subgraph_param_data);
 
     return status;
 }
@@ -1257,17 +1448,26 @@ int32_t ats_online_ioctl(
     case ATS_CMD_ONC_SET_CAL_DATA_NON_PERSIST:
         func_cb = ats_onc_set_cal_data_non_persist;
         break;
+    case ATS_CMD_ONC_SET_CAL_DATA_NON_PERSIST_2:
+        func_cb = ats_onc_set_cal_data_non_persist_2;
+        break;
     case ATS_CMD_ONC_GET_CAL_DATA_PERSIST:
         func_cb = ats_onc_get_cal_data_persist;
         break;
     case ATS_CMD_ONC_SET_CAL_DATA_PERSIST:
         func_cb = ats_onc_set_cal_data_persist;
         break;
+    case ATS_CMD_ONC_SET_CAL_DATA_PERSIST_2:
+        func_cb = ats_onc_set_cal_data_persist_2;
+        break;
     case ATS_CMD_ONC_GET_TAG_DATA:
         func_cb = ats_onc_get_tag_data;
         break;
     case ATS_CMD_ONC_SET_TAG_DATA:
         func_cb = ats_onc_set_tag_data;
+        break;
+    case ATS_CMD_ONC_SET_TAG_DATA_2:
+        func_cb = ats_onc_set_tag_data_2;
         break;
     case ATS_CMD_ONC_DELETE_DELTA_FILES:
         func_cb = ats_onc_delete_delta_files;

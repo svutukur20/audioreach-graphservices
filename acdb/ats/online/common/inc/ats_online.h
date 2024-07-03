@@ -25,7 +25,7 @@
 * Defines and Constants
 *----------------------------------------------------------------------------*/
 #define ATS_ONC_MAJOR_VERSION 0x1
-#define ATS_ONC_MINOR_VERSION 0x3
+#define ATS_ONC_MINOR_VERSION 0x4
 
 /* ---------------------------------------------------------------------------
 * Public Functions

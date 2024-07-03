@@ -36,17 +36,17 @@ int32_t AtsCmdGetHeapEntryData(acdb_handle_t acdb_handle, AcdbGraphKeyVector* ke
 
 int32_t AtsCmdGetCalDataNonPersist(AtsGetSubgraphCalDataReq *req, AcdbBufferContext *rsp);
 
-int32_t AtsCmdSetCalDataNonPersist(AcdbGraphKeyVector* cal_key_vector,
+int32_t AtsCmdSetCalDataNonPersist(bool_t should_persist, AcdbGraphKeyVector* cal_key_vector,
     AcdbSubgraphParamData* subgraph_param_data);
 
 int32_t AtsCmdGetCalDataPersist(AtsGetSubgraphCalDataReq *req, AcdbBufferContext *rsp);
 
-int32_t AtsCmdSetCalDataPersist(AcdbGraphKeyVector* cal_key_vector,
+int32_t AtsCmdSetCalDataPersist(bool_t should_persist, AcdbGraphKeyVector* cal_key_vector,
     AcdbSubgraphParamData* subgraph_param_data);
 
 int32_t AtsCmdGetTagData(AtsGetSubgraphTagDataReq* req, AcdbBufferContext *rsp);
 
-int32_t AtsCmdSetTagData(AcdbModuleTag* module_tag,
+int32_t AtsCmdSetTagData(bool_t should_persist, AcdbModuleTag* module_tag,
     AcdbSubgraphParamData* subgraph_param_data);
 
 int32_t AtsCmdDeleteDeltaFiles(void);

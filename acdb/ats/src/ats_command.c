@@ -176,6 +176,7 @@ int32_t AtsCmdGetCalDataNonPersist(
 }
 
 int32_t AtsCmdSetCalDataNonPersist(
+    bool_t should_persist,
     AcdbGraphKeyVector* cal_key_vector,
     AcdbSubgraphParamData* subgraph_param_data)
 {
@@ -208,17 +209,13 @@ int32_t AtsCmdSetCalDataNonPersist(
         return status;
     }
 
-    if (acdb_delta_data_is_persist_enabled())
+    if (acdb_delta_data_is_persist_enabled() && should_persist)
     {
         status = acdb_delta_data_ioctl(ACDB_DELTA_DATA_CMD_SAVE, NULL, 0, NULL, 0);
         if (AR_FAILED(status))
         {
             ATS_ERR("Error(%d) Failed to save delta file", status);
         }
-    }
-    else
-    {
-        ATS_ERR("Unable to save delta data. Is delta data persistance enabled?", status);
     }
 
     return status;
@@ -283,6 +280,7 @@ int32_t AtsCmdGetCalDataPersist(
 }
 
 int32_t AtsCmdSetCalDataPersist(
+    bool_t should_persist,
     AcdbGraphKeyVector* cal_key_vector,
     AcdbSubgraphParamData* subgraph_param_data)
 {
@@ -315,17 +313,13 @@ int32_t AtsCmdSetCalDataPersist(
         return status;
     }
 
-    if (acdb_delta_data_is_persist_enabled())
+    if (acdb_delta_data_is_persist_enabled() && should_persist)
     {
         status = acdb_delta_data_ioctl(ACDB_DELTA_DATA_CMD_SAVE, NULL, 0, NULL, 0);
         if (AR_FAILED(status))
         {
             ATS_ERR("Error(%d) Failed to save delta file", status);
         }
-    }
-    else
-    {
-        ATS_ERR("Unable to save delta data. Is delta data persistance enabled?", status);
     }
 
     return status;
@@ -407,6 +401,7 @@ int32_t AtsCmdGetTagData(
 }
 
 int32_t AtsCmdSetTagData(
+    bool_t should_persist,
     AcdbModuleTag* module_tag,
     AcdbSubgraphParamData* subgraph_param_data)
 {
@@ -439,17 +434,13 @@ int32_t AtsCmdSetTagData(
         return status;
     }
 
-    if (acdb_delta_data_is_persist_enabled())
+    if (acdb_delta_data_is_persist_enabled() && should_persist)
     {
         status = acdb_delta_data_ioctl(ACDB_DELTA_DATA_CMD_SAVE, NULL, 0, NULL, 0);
         if (AR_FAILED(status))
         {
             ATS_ERR("Error(%d) Failed to save delta file", status);
         }
-    }
-    else
-    {
-        ATS_ERR("Unable to save delta data. Is delta data persistance enabled?", status);
     }
 
     return status;
