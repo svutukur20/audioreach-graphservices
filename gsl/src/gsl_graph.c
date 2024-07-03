@@ -43,6 +43,20 @@ struct gsl_blob {
 	void *buf; /**< pointer to the blob */
 };
 
+/* Used to return tags and module info data sorted by processor id to client */
+struct gsl_module_id_proc_info_entry {
+	uint32_t proc_domain_id; // process the modules are running on
+	uint32_t num_modules; // number of entries in module list
+	struct gsl_module_id_info_entry module_entry[]; // module list
+};
+
+struct gsl_module_id_proc_info {
+	uint32_t num_procs; // number of processors in proc_module_list
+	uint32_t list_size; //size of proc_module_list
+	struct gsl_module_id_proc_info_entry* proc_module_list;
+	// list of module ids and tags sorted by processor id
+};
+
 static uint8_t count_set_bits(uint32_t value)
 {
 	uint8_t lut[16] = { 0, 1, 1, 2, 1, 2, 2, 3,
@@ -1531,6 +1545,67 @@ static int32_t _gsl_graph_get_module_tag_info(uint32_t *sg_id_list,
 cleanup:
 	if (rc)
 		gsl_mem_free(mod_info);
+	return rc;
+}
+
+int32_t _gsl_graph_get_module_proc_tag_info(uint32_t* sg_id_list,
+	uint32_t num_sgs, uint32_t tag, struct gsl_module_id_proc_info **proc_module_info) {
+	AcdbGetProcTaggedModulesReq acdb_req;
+	AcdbGetProcTaggedModulesRsp acdb_rsp;
+	int32_t rc = AR_EOK;
+	struct gsl_module_id_proc_info* proc_mod_info;
+
+	acdb_req.num_sg_ids = num_sgs;
+	acdb_req.sg_ids = sg_id_list;
+	acdb_req.tag_id = tag;
+	acdb_rsp.num_procs = 0;
+	acdb_rsp.list_size = 0;
+	acdb_rsp.proc_tagged_module_list = NULL;
+	rc = acdb_ioctl(ACDB_CMD_GET_PROC_TAGGED_MODULES, &acdb_req,
+		sizeof(acdb_req), &acdb_rsp, sizeof(acdb_rsp));
+	if (rc && rc != AR_ENOTEXIST) {
+		GSL_ERR("acdb_ioctl failed with err %d", rc);
+		return rc;
+	}
+	if (acdb_rsp.list_size == 0) {
+		GSL_ERR("number of modules tagged with 0x%x are zero", tag);
+		return AR_ENOTEXIST;
+	}
+
+	//Allocate space for the process module list
+	acdb_rsp.proc_tagged_module_list = gsl_mem_zalloc(acdb_rsp.list_size);
+	if (!acdb_rsp.proc_tagged_module_list) {
+		rc = AR_ENOMEMORY;
+		return rc;
+	}
+	rc = acdb_ioctl(ACDB_CMD_GET_PROC_TAGGED_MODULES, &acdb_req,
+		sizeof(acdb_req), &acdb_rsp, sizeof(acdb_rsp));
+	if (rc && rc != AR_ENOTEXIST) {
+		GSL_ERR("acdb_ioctl failed with err %d", rc);
+		if (acdb_rsp.proc_tagged_module_list)
+			gsl_mem_free(acdb_rsp.proc_tagged_module_list);
+		return rc;
+	}
+	if (rc) {
+		GSL_ERR("acdb_ioctl failed with err %d", rc);
+		goto cleanup;
+	}
+	//Allocate space for the top level gsl_module_id_proc_info struct
+	proc_mod_info = gsl_mem_zalloc(acdb_rsp.list_size + 8);
+	if (!proc_mod_info) {
+		rc = AR_ENOMEMORY;
+		return rc;
+	}
+	proc_mod_info->num_procs = acdb_rsp.num_procs;
+	proc_mod_info->list_size = acdb_rsp.list_size;
+	proc_mod_info->proc_module_list =
+		(struct gsl_module_id_proc_info_entry*)acdb_rsp.proc_tagged_module_list;
+	*proc_module_info = proc_mod_info;
+
+
+	cleanup:
+	if (rc && acdb_rsp.proc_tagged_module_list != NULL)
+		gsl_mem_free(acdb_rsp.proc_tagged_module_list);
 	return rc;
 }
 
@@ -3597,8 +3672,7 @@ static int32_t gsl_graph_cache_datapath_miid(struct gsl_graph *graph,
 {
 	int32_t rc = AR_EOK;
 	struct gsl_sgid_list sg_id_list = {0, NULL};
-	struct gsl_module_id_info *module_info;
-	uint32_t module_info_size;
+	struct gsl_module_id_proc_info* proc_module_info;
 
 	if ((mode & GSL_ATTRIBUTES_DATAPATH_SETUP_MASK) >>
 		GSL_ATTRIBUTES_DATAPATH_SETUP_SHIFT
@@ -3621,28 +3695,31 @@ static int32_t gsl_graph_cache_datapath_miid(struct gsl_graph *graph,
 		return rc;
 	}
 
-	rc = _gsl_graph_get_module_tag_info(sg_id_list.sg_ids,
-		sg_id_list.len, tag,
-		&module_info, &module_info_size);
+	rc = _gsl_graph_get_module_proc_tag_info(sg_id_list.sg_ids,
+		sg_id_list.len, tag, &proc_module_info);
 	if (rc) {
 		GSL_ERR("fail to get write tag module iid %d", rc);
 		goto free_sg_ids;
 	}
-	if (module_info->num_modules != 1) {
-		GSL_ERR("number of tagged modules with Tag %d is %d, expected 1",
-			tag, module_info->num_modules);
+	if (proc_module_info->num_procs != 1) {
+		GSL_ERR("number of proc ids returned is %d, expected 1",
+			proc_module_info->num_procs);
 		rc = AR_EFAILED;
 		goto free_module_info;
 	}
 	/*
-	 * cache the module and tag, note we only cache for a single tag, it is
+	 * cache the module, tag, and proc id, note we only cache for a single tag, it is
 	 * assumed that each graph can have at most 1 write EP and 1 read EP
 	 */
-	dp_info->miid = module_info->module_entry[0].module_iid;
+	dp_info->miid =
+		proc_module_info->proc_module_list->module_entry[0].module_iid;
 	dp_info->cached_tag = tag;
+	dp_info->master_proc_id =
+		proc_module_info->proc_module_list->proc_domain_id;
 
 free_module_info:
-	gsl_mem_free(module_info);
+	gsl_mem_free(proc_module_info->proc_module_list);
+	gsl_mem_free(proc_module_info);
 free_sg_ids:
 	gsl_mem_free(sg_id_list.sg_ids);
 
@@ -3654,6 +3731,7 @@ int32_t gsl_graph_config_data_path(struct gsl_graph *graph,
 {
 	int32_t rc = AR_EOK;
 	struct gsl_data_path_info *dp_info;
+	uint32_t proc_id = graph->proc_id;
 
 	/*
 	 * Have to check graph state and cached miid outside of datapath
@@ -3680,11 +3758,12 @@ int32_t gsl_graph_config_data_path(struct gsl_graph *graph,
 			GSL_ERR("cache data path miid failed %d", rc);
 			goto exit;
 		}
+		//Update the process id with the returned value
+		proc_id = dp_info->master_proc_id;
 	}
-
 	rc = gsl_dp_config_data_path(dp_info, cfg, graph->src_port,
 		&graph->graph_signal[GRAPH_CTRL_GRP2_CMD_SIG], dir, NULL,
-		graph->proc_id);
+		proc_id);
 	if (rc)
 		GSL_ERR("configure data path failed %d", rc);
 
