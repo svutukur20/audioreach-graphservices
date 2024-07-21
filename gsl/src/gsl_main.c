@@ -867,89 +867,66 @@ int32_t gsl_get_driver_data(const uint32_t module_id,
 }
 
 int32_t gsl_get_graph_tkvs(const struct gsl_key_vector *graph_key_vect,
-	void *data_payload, uint32_t *data_payload_size)
+	struct gsl_tag_key_vector_list *data_payload)
 {
-	AcdbBlob acdb_rsp = { 0, };
 	int32_t rc = AR_EOK;
-	AcdbGraphKeyVector cmd_struct;
 
-	/* need to construct AcdbKeyVector because it is packed, gsl_kv isn't */
-	cmd_struct.num_keys = graph_key_vect->num_kvps;
-	cmd_struct.graph_key_vector = (AcdbKeyValuePair *)graph_key_vect->kvp;
-
+	if (graph_key_vect == NULL)
+		return AR_EBADPARAM;
 	/* query acdb */
-	acdb_rsp.buf = data_payload;
-	acdb_rsp.buf_size = *data_payload_size;
-	rc = acdb_ioctl(ACDB_CMD_GET_GRAPH_TAG_KVS, &cmd_struct,
-		sizeof(cmd_struct), acdb_rsp.buf, acdb_rsp.buf_size);
+	rc = acdb_ioctl(ACDB_CMD_GET_GRAPH_TAG_KVS, graph_key_vect,
+		sizeof(*graph_key_vect), (void *)data_payload, sizeof(struct gsl_tag_key_vector_list));
 	if (rc != AR_EOK)
 		GSL_ERR("acdb query ACDB_CMD_GET_GRAPH_TAG_KVS failed %d", rc);
 
-	*data_payload_size = acdb_rsp.buf_size;
 	return rc;
 }
 
 int32_t gsl_get_graph_ckvs(const struct gsl_key_vector *graph_key_vect,
-	void *data_payload, uint32_t *data_payload_size)
+	struct gsl_key_vector_list *data_payload)
 {
-	AcdbBlob acdb_rsp = { 0, };
 	int32_t rc = AR_EOK;
-	AcdbGraphKeyVector cmd_struct;
 
-	/* need to construct AcdbKeyVector because it is packed, gsl_kv isn't */
-
-	cmd_struct.num_keys = graph_key_vect->num_kvps;
-	cmd_struct.graph_key_vector = (AcdbKeyValuePair *)graph_key_vect->kvp;
-
+	if (graph_key_vect == NULL)
+		return AR_EBADPARAM;
 	/* query acdb */
-	acdb_rsp.buf = data_payload;
-	acdb_rsp.buf_size = *data_payload_size;
-	rc = acdb_ioctl(ACDB_CMD_GET_GRAPH_CAL_KVS, &cmd_struct,
-		sizeof(cmd_struct), acdb_rsp.buf, acdb_rsp.buf_size);
+	rc = acdb_ioctl(ACDB_CMD_GET_GRAPH_CAL_KVS, graph_key_vect,
+		sizeof(*graph_key_vect), (void *)data_payload, sizeof(struct gsl_key_vector_list));
 	if (rc != AR_EOK)
 		GSL_ERR("acdb query ACDB_CMD_GET_GRAPH_CAL_KVS failed %d", rc);
 
-	*data_payload_size = acdb_rsp.buf_size;
 	return rc;
 }
 
-int32_t gsl_get_driver_module_kvs(const uint32_t *driver_id,
-	void *data_payload, uint32_t *data_payload_size)
+int32_t gsl_get_driver_module_kvs(uint32_t driver_id,
+	struct gsl_key_vector_list *data_payload)
 {
-	AcdbBlob acdb_rsp = { 0, };
 	int32_t rc = AR_EOK;
 
 	/* query acdb */
-	acdb_rsp.buf = data_payload;
-	acdb_rsp.buf_size = *data_payload_size;
-	rc = acdb_ioctl(ACDB_CMD_GET_DRIVER_MODULE_KVS, driver_id,
-		sizeof(*driver_id), acdb_rsp.buf, acdb_rsp.buf_size);
+	rc = acdb_ioctl(ACDB_CMD_GET_DRIVER_MODULE_KVS, &driver_id,
+		sizeof(driver_id), (void *)data_payload, sizeof(struct gsl_key_vector_list));
 	if (rc != AR_EOK)
 		GSL_ERR("acdb query ACDB_CMD_GET_DRIVER_MODULE_KVS failed %d", rc);
 
-	*data_payload_size = acdb_rsp.buf_size;
 	return rc;
 }
 
 int32_t gsl_get_supported_gkvs(uint32_t *key_ids,
-	const uint32_t num_key_ids, void *data_payload,
-	uint32_t *data_payload_size)
+	const uint32_t num_key_ids, struct gsl_key_vector_list *data_payload)
 {
 	AcdbUintList uint_list = { 0, };
-	AcdbBlob acdb_rsp = { 0, };
 	int32_t rc = AR_EOK;
 
 	/* query acdb */
 	uint_list.count = num_key_ids;
 	uint_list.list = key_ids;
-	acdb_rsp.buf = data_payload;
-	acdb_rsp.buf_size = *data_payload_size;
+
 	rc = acdb_ioctl(ACDB_CMD_GET_SUPPORTED_GKVS, &uint_list,
-		sizeof(uint_list), acdb_rsp.buf, acdb_rsp.buf_size);
+		sizeof(uint_list), (void *)data_payload, sizeof(struct gsl_key_vector_list));
 	if (rc != AR_EOK)
 		GSL_ERR("acdb query ACDB_CMD_GET_SUPPORTED_GKVS failed %d", rc);
 
-	*data_payload_size = acdb_rsp.buf_size;
 	return rc;
 }
 
@@ -1109,8 +1086,8 @@ int32_t gsl_init(struct gsl_init_data *init_data)
 		}
 		/* @TODO: Remove below code once we rely on UP notifications from Spf */
 		gsl_spf_ss_state_set(master_procs[i], 0xFFF,
-				     //GSL_GET_SPF_SS_MASK(master_procs[i]),
-				     GSL_SPF_SS_STATE_UP);
+					//GSL_GET_SPF_SS_MASK(master_procs[i]),
+					GSL_SPF_SS_STATE_UP);
 	}
 
 	rc = gsl_msg_builder_init(num_master_procs, master_procs);
@@ -1131,7 +1108,7 @@ int32_t gsl_init(struct gsl_init_data *init_data)
 			 * assume all up by now
 			 */
 			rc = gsl_mdf_utils_shmem_alloc(supported_ss_mask,
-						       master_procs[i]);
+								master_procs[i]);
 			if ((rc != AR_EOK) && (rc != AR_EUNSUPPORTED)) {
 				GSL_ERR("failed to alloc loaned shmem %d", rc)
 					goto msg_builder_deinit;
@@ -1293,9 +1270,9 @@ int32_t gsl_open(const struct gsl_key_vector *graph_key_vect,
 	int32_t rc = AR_EOK;
 	struct gsl_graph *graph = NULL;
 	gsl_handle_t hdl = 0;
-    uint32_t supported_ss_mask = 0;
-    bool_t is_shmem_supported = TRUE;
-    uint8_t i = 0;
+	uint32_t supported_ss_mask = 0;
+	bool_t is_shmem_supported = TRUE;
+	uint8_t i = 0;
 	int32_t ss_retry_count = 10;
 
 	if (graph_handle == NULL)
@@ -1314,73 +1291,73 @@ int32_t gsl_open(const struct gsl_key_vector *graph_key_vect,
 		goto cleanup;
 	}
 
-    for (i = AR_SUB_SYS_ID_FIRST; i <= AR_SUB_SYS_ID_LAST; i++) {
-        GSL_MUTEX_LOCK(gsl_ctxt.open_close_lock);
-        if (gsl_ctxt.spf_restart[i]) {
-            GSL_MUTEX_UNLOCK(gsl_ctxt.open_close_lock);
+	for (i = AR_SUB_SYS_ID_FIRST; i <= AR_SUB_SYS_ID_LAST; i++) {
+		GSL_MUTEX_LOCK(gsl_ctxt.open_close_lock);
+		if (gsl_ctxt.spf_restart[i]) {
+			GSL_MUTEX_UNLOCK(gsl_ctxt.open_close_lock);
 
-            // handle master proc restarting
-            gsl_shmem_remap_pre_alloc(i);
-            gsl_mdf_utils_get_supported_ss_info_from_master_proc(i, &supported_ss_mask);
-            // open_close_lock will be acquired insides
-            rc = gsl_send_spf_satellite_info(i, supported_ss_mask);
-            if (rc) {
-                GSL_ERR("gsl_send_spf_satellite_info failed for master_proc %d rc %d", i, rc);
-                continue;
-            }
+			// handle master proc restarting
+			gsl_shmem_remap_pre_alloc(i);
+			gsl_mdf_utils_get_supported_ss_info_from_master_proc(i, &supported_ss_mask);
+			// open_close_lock will be acquired insides
+			rc = gsl_send_spf_satellite_info(i, supported_ss_mask);
+			if (rc) {
+				GSL_ERR("gsl_send_spf_satellite_info failed for master_proc %d rc %d", i, rc);
+				continue;
+			}
 
-            __gpr_cmd_is_shared_mem_supported(i, &is_shmem_supported);
-            if (is_shmem_supported) {
-                rc = gsl_mdf_utils_shmem_alloc(supported_ss_mask, i);
-                if (rc != AR_EOK && rc != AR_EUNSUPPORTED) {
-                    GSL_ERR("failed to alloc loaned shmem for master_proc %d rc %d", i, rc);
-                    continue;
-                }
-            }
+			__gpr_cmd_is_shared_mem_supported(i, &is_shmem_supported);
+			if (is_shmem_supported) {
+				rc = gsl_mdf_utils_shmem_alloc(supported_ss_mask, i);
+				if (rc != AR_EOK && rc != AR_EUNSUPPORTED) {
+					GSL_ERR("failed to alloc loaned shmem for master_proc %d rc %d", i, rc);
+					continue;
+				}
+			}
 
-            rc = gsl_do_load_bootup_dyn_modules(i, NULL);
-            if (rc != AR_EOK && rc != AR_ENOTEXIST) {
-                GSL_ERR("dynamic module load failed for master_proc %d rc %d", i, rc);
-                continue;
-            }
+			rc = gsl_do_load_bootup_dyn_modules(i, NULL);
+			if (rc != AR_EOK && rc != AR_ENOTEXIST) {
+				GSL_ERR("dynamic module load failed for master_proc %d rc %d", i, rc);
+				continue;
+			}
 
-            GSL_MUTEX_LOCK(gsl_ctxt.open_close_lock);
-            gsl_ctxt.spf_restart[i] = FALSE;
-        }
-        GSL_MUTEX_UNLOCK(gsl_ctxt.open_close_lock);
-    }
+			GSL_MUTEX_LOCK(gsl_ctxt.open_close_lock);
+			gsl_ctxt.spf_restart[i] = FALSE;
+		}
+		GSL_MUTEX_UNLOCK(gsl_ctxt.open_close_lock);
+	}
 
     /*
      * Initialize graph instance and register to GPR to
      * receive/send commands/events/data from spf
      * State is updated under lock to sync with SSR
      */
-    GSL_MUTEX_LOCK(gsl_ctxt.graph_hdl_lock);
-    rc = gsl_graph_init(graph);
-    GSL_MUTEX_UNLOCK(gsl_ctxt.graph_hdl_lock);
-    if (rc) {
-        GSL_ERR("graph_init failed %d", rc);
-        goto release_handle;
-    }
+	GSL_MUTEX_LOCK(gsl_ctxt.graph_hdl_lock);
+	rc = gsl_graph_init(graph);
+	GSL_MUTEX_UNLOCK(gsl_ctxt.graph_hdl_lock);
+	if (rc) {
+		GSL_ERR("graph_init failed %d", rc);
+		goto release_handle;
+	}
 
-    while (ss_retry_count--) {
-        rc = gsl_graph_open(graph, graph_key_vect, cal_key_vect, gsl_ctxt.open_close_lock);
-        if (AR_ESUBSYSRESET == rc) {
-            GSL_INFO("wait subsystem online, remaining retry count: %d", ss_retry_count);
-            ar_osal_micro_sleep(GSL_TIMEOUT_US(GSL_SS_RETRY_MS));
-            continue;
-        } else if (rc) {
-            GSL_ERR("graph_open failed %d", rc);
-            goto deinit;
-        }
-        break;
-    }
+	while (ss_retry_count--) {
+		rc = gsl_graph_open(graph, graph_key_vect, cal_key_vect, gsl_ctxt.open_close_lock);
+		if (AR_ESUBSYSRESET == rc) {
+			GSL_INFO("wait subsystem online, remaining retry count: %d", ss_retry_count);
+			ar_osal_micro_sleep(GSL_TIMEOUT_US(GSL_SS_RETRY_MS));
+			continue;
+		} else if (rc) {
+			GSL_ERR("graph_open failed %d", rc);
+			goto deinit;
+		}
+		break;
+	}
     // If it comes out from while() with a AR_ESUBSYSRESET even after ss_retry_count's retry,
     // we should goto deinit.
-    if (AR_ESUBSYSRESET == rc)
-        goto deinit;
+	if (AR_ESUBSYSRESET == rc)
+		goto deinit;
 
-    *graph_handle = hdl;
+	*graph_handle = hdl;
 
 	if (gsl_ctxt.rtc_conn_active)
 		graph->rtc_conn_active = true;

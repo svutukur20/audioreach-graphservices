@@ -276,6 +276,54 @@ struct gsl_key_vector {
 };
 
 /**
+ * a key vector with a zero sized array.
+ */
+struct gsl_key_vector_array {
+	uint32_t num_keys;  /**< number of keys */
+	struct gsl_key_value_pair kvp[];  /**< array of key value pairs.*/
+};
+
+/**
+ * a key vector list
+ */
+struct gsl_key_vector_list {
+	/**< number of key vectors in the key vector list */
+	uint32_t num_key_vectors;
+	/**< size of the key vector list in bytes */
+	uint32_t list_size;
+	/**< list of key vectors in the format of
+	 * [#keys, kvPair+,..., #keys, kvPair+]
+	 */
+	struct gsl_key_vector_array *key_vector_list;
+};
+
+/**
+ * a tag key vector with a zero sized array
+ */
+struct gsl_tag_key_vector {
+	/**< the module tag identifier */
+	uint32_t tag_id;
+	/**< number of keys */
+	uint32_t num_keys;
+	/**< graph key value pair */
+	struct gsl_key_value_pair kvp[];
+};
+
+/**
+ * a tag key vector list
+ */
+struct gsl_tag_key_vector_list {
+	/**< number of key vectors in the key vector list */
+	uint32_t num_key_vectors;
+	/**< size of the key vector list in bytes */
+	uint32_t list_size;
+	/**< list of key vectors in the format of
+	 *[#keys, kvPair+,..., #keys, kvPair+]
+	 */
+	struct gsl_tag_key_vector *key_vector_list;
+};
+
+/**
  * Command payload for GSL_CMD_STOP ioctl. Properties used to match
  * portions of the graph on which the command will be applied.
  * This structure is used to match against the properties defined in
@@ -1115,15 +1163,14 @@ int32_t gsl_get_driver_data(const uint32_t module_id,
  *
  * \param[in] graph_key_vect: GKV to find tag & TKV pairs in ACDB for
  * \param[in,out] data_payload: buffer where data will be returned, client is
- * responsible to allocate memory for this buffer. If this is set to NULL
- * the size of the output data will be returned in data_payload_size
- * \param[in,out] data_payload_size: on input it containes the size of
- * data_payload, on output will have the size actually written
+ * responsible to allocate memory for this buffer.
+ * If data_payload->key_vector_list is set to NULL,
+ * the size of the output data will be returned in data_payload->list_size.
  *
  * \return AR_EOK in success, error code otherwise
  */
 int32_t gsl_get_graph_tkvs(const struct gsl_key_vector *graph_key_vect,
-	void *data_payload, uint32_t *data_payload_size);
+	struct gsl_tag_key_vector_list *data_payload);
 
 /**
  * \brief Get all CKVs for given GKV
@@ -1133,15 +1180,14 @@ int32_t gsl_get_graph_tkvs(const struct gsl_key_vector *graph_key_vect,
  *
  * \param[in] graph_key_vect: GKV to find CKVs in ACDB for
  * \param[in,out] data_payload: buffer where data will be returned, client is
- * responsible to allocate memory for this buffer. If this is set to NULL
- * the size of the output data will be returned in data_payload_size
- * \param[in,out] data_payload_size: on input it containes the size of
- * data_payload, on output will have the size actually written
+ * responsible to allocate memory for this buffer.
+ * If data_payload->key_vector_list is set to NULL,
+ * the size of the output data will be returned in data_payload->list_size.
  *
  * \return AR_EOK in success, error code otherwise
  */
 int32_t gsl_get_graph_ckvs(const struct gsl_key_vector *graph_key_vect,
-	void *data_payload, uint32_t *data_payload_size);
+	struct gsl_key_vector_list *data_payload);
 
 /**
  * \brief Get KVs used by driver module
@@ -1150,15 +1196,14 @@ int32_t gsl_get_graph_ckvs(const struct gsl_key_vector *graph_key_vect,
  *
  * \param[in] driver_id: uint32_t identifying the driver module
  * \param[in,out] data_payload: buffer where data will be returned, client is
- * responsible to allocate memory for this buffer. If this is set to NULL
- * the size of the output data will be returned in data_payload_size
- * \param[in,out] data_payload_size: on input it containes the size of
- * data_payload, on output will have the size actually written
+ * responsible to allocate memory for this buffer.
+ * If data_payload->key_vector_list is set to NULL,
+ * the size of the output data will be returned in data_payload->list_size.
  *
  * \return AR_EOK in success, error code otherwise
  */
-int32_t gsl_get_driver_module_kvs(const uint32_t *driver_id,
-	void *data_payload, uint32_t *data_payload_size);
+int32_t gsl_get_driver_module_kvs(uint32_t driver_id,
+	struct gsl_key_vector_list *data_payload);
 
 /**
  * \brief Get all GKVs that contain the provided key IDs as a subset
@@ -1171,16 +1216,14 @@ int32_t gsl_get_driver_module_kvs(const uint32_t *driver_id,
  * \param[in] key_ids: pointer to the set of key IDs to query. Client-managed
  * \param[in] num_key_ids: number of entries in key_ids
  * \param[in,out] data_payload: buffer where data will be returned, client is
- * responsible to allocate memory for this buffer. If this is set to NULL
- * the size of the output data will be returned in data_payload_size
- * \param[in,out] data_payload_size: on input it containes the size of
- * data_payload, on output will have the size actually written
+ * responsible to allocate memory for this buffer.
+ * If data_payload->key_vector_list is set to NULL,
+ * the size of the output data will be returned in data_payload->list_size.
  *
  * \return AR_EOK in success, error code otherwise
  */
 int32_t gsl_get_supported_gkvs(uint32_t *key_ids,
-	const uint32_t num_key_ids, void *data_payload,
-	uint32_t *data_payload_size);
+	const uint32_t num_key_ids, struct gsl_key_vector_list *data_payload);
 
 /**
  * \brief get human-readable alias for a GKV
