@@ -572,7 +572,7 @@ void LogKeyIDs(const AcdbUintList *keys, KeyVectorType type)
 
 void LogKeyVector(const AcdbGraphKeyVector *key_vector, KeyVectorType type)
 {
-    if (key_vector == NULL) return;
+    if (key_vector == NULL || key_vector->graph_key_vector == NULL) return;
 
     switch (type)
     {
