@@ -209,6 +209,7 @@ int32_t acdb_ctx_man_reset(void)
     }
 
     ar_osal_mutex_destroy(acdb_ctx_man_context.ctx_man_lock);
+    ar_osal_mutex_destroy(acdb_ctx_man_context.acdb_client_lock);
     ar_mem_set(&acdb_ctx_man_context, 0, sizeof(AcdbCtxManContext));
     return status;
 }
