@@ -195,7 +195,7 @@ int32_t ar_data_log_commit(ar_data_log_commit_info_t *info)
         {
             for (i = 0; i < pcm_data_info_ptr->num_channels; i++)
             {
-                pcm_data_fmt->channel_mapping[i] = i + 1;
+                pcm_data_fmt->channel_mapping[i] = (uint8_t)i + 1;
             }
         }
 
@@ -248,7 +248,7 @@ int32_t ar_data_log_commit(ar_data_log_commit_info_t *info)
         log_pkt_generic->header.info.header_length = sizeof(ar_log_pkt_fragment_info_t) - sizeof(uint32_t);
         log_pkt_generic->header.info.fragment_count = 1;
         log_pkt_generic->header.info.fragment_num = 1;
-        log_pkt_generic->header.info.fragment_length = info->buffer_size;
+        log_pkt_generic->header.info.fragment_length = (uint16_t)info->buffer_size;
         log_pkt_generic->header.info.fragment_offset = 0;
         log_pkt_generic->header.info.buffer_length = info->buffer_size;
         log_pkt_generic->header.info.time_stamp = pkt_info->log_time_stamp;
@@ -331,7 +331,11 @@ int32_t ar_data_log_submit(ar_data_log_submit_info_t *info)
 
         log_pkt = _log_alloc_pkt(
             log_pkt_size, info->log_code, TRUE, info->pkt_type);
-
+        if (!log_pkt)
+        {
+            AR_DATA_LOG_ERR("Status[%d]: _log_alloc_pkt failed", AR_ENOMEMORY);
+            return AR_ENOMEMORY;
+        }
         fragment.length = log_pkt_size;
 
         switch (info->pkt_type)
@@ -526,7 +530,9 @@ void *_log_alloc_pkt(
     //AR_DATA_LOG_DBG("Req Pkt Size %u : bytes for log code 0x%X",
     //    log_pkt_size, log_code);
 
-    log_pkt_ptr = ar_log_pkt_alloc(log_code, log_pkt_size);
+    log_pkt_ptr = ar_log_pkt_alloc((uint16_t)log_code, log_pkt_size);
+    if (!log_pkt_ptr)
+        return NULL;
 
     if (handle_fragments)
         return log_pkt_ptr;
@@ -641,15 +647,15 @@ static int32_t _log_pcm_pkt(
     ar_log_pkt_cmn_audio_header_t       *log_header_cmn = NULL;
     ar_log_pkt_pcm_data_format_t        *pcm_data_fmt = NULL;
     ar_data_log_pcm_info_t              *pcm_data_info_ptr = NULL;
-    uint32_t                            i = 0;
+    uint16_t                            i = 0;
     uint8_t                             *log_dst_ptr = NULL;
     ar_data_log_pkt_pcm_t               *pcm_log_pkt = NULL;
     bool_t                              is_seg_pkt = FALSE;
-    uint32_t                            num_channels = 0;
+    uint16_t                            num_channels = 0;
     uint32_t                            num_bytes_per_channel = 0;
     uint32_t                            total_num_bytes_per_channel = 0;
     ar_data_log_pcm_pkt_info_t          *pcm_log_pkt_info = NULL;
-
+    __UNREFERENCED_PARAM(buffer_size);
     if (!log_pkt || !buffer || !fragment || !info)
     {
         AR_DATA_LOG_ERR("Status[%d]: Bad input parameter(s)",
@@ -735,7 +741,7 @@ static int32_t _log_pcm_pkt(
     {
         for (i = 0; i < pcm_data_info_ptr->num_channels; i++)
         {
-            pcm_data_fmt->channel_mapping[i] = i + 1;
+            pcm_data_fmt->channel_mapping[i] = (uint8_t)(i + 1);
         }
     }
 
@@ -804,7 +810,6 @@ static int32_t _log_generic_pkt(
     ar_data_log_submit_info_t *info)
 {
     int32_t                         status = AR_EOK;
-    uint8_t                         *log_dst_ptr = NULL;
     ar_data_log_generic_pkt_info_t  *pkt_info = NULL;
     ar_data_log_pkt_generic_t       *generic_log_pkt = NULL;
 
@@ -824,19 +829,18 @@ static int32_t _log_generic_pkt(
 
     generic_log_pkt->header.info.header_length =
         sizeof(ar_log_pkt_fragment_info_t) - sizeof(uint32_t);
-    generic_log_pkt->header.info.fragment_count = fragment->total_count;
+    generic_log_pkt->header.info.fragment_count = (uint16_t)fragment->total_count;
     generic_log_pkt->header.info.buffer_length = buffer_size;
     generic_log_pkt->header.info.session_id = info->session_id;
     generic_log_pkt->header.info.tap_point_id = info->log_tap_id;
     generic_log_pkt->header.info.token_id = pkt_info->token_id;
     generic_log_pkt->header.info.reserved = 0;
-    generic_log_pkt->header.info.fragment_num = fragment->number;
-    generic_log_pkt->header.info.fragment_length = fragment->length;
+    generic_log_pkt->header.info.fragment_num = (uint16_t)fragment->number;
+    generic_log_pkt->header.info.fragment_length = (uint16_t)fragment->length;
     generic_log_pkt->header.info.fragment_offset = fragment->offset;
     generic_log_pkt->header.info.time_stamp = pkt_info->log_time_stamp;
 
-    generic_log_pkt->header.cmd.header_length =
-        sizeof(ar_log_pkt_data_format_header_t) - sizeof(uint32_t);
+    generic_log_pkt->header.cmd.header_length = sizeof(ar_log_pkt_data_format_header_t) - sizeof(uint32_t);
     generic_log_pkt->header.cmd.version = 1;
     generic_log_pkt->header.cmd.format_id = (uint32_t)pkt_info->format;
 
