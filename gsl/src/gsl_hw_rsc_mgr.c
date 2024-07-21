@@ -221,7 +221,10 @@ static int32_t gsl_command_hw_rsc_custom_config(const uint8_t *payload,
 	rc = gsl_send_spf_cmd(&send_pkt, &gsl_hw_rsc_ctxt.sig, NULL);
 	if (rc)
 		GSL_ERR("hw rsc cmd 0x%x failed:%d", cmd, rc);
-
+	if (rc == AR_ETIMEOUT) {
+		gsl_hw_rsc_ctxt.rsp_buff = NULL;
+		gsl_hw_rsc_ctxt.rsp_buff_sz = 0;
+	}
 	if (buff && buff_size)
 		*buff_size = gsl_hw_rsc_ctxt.rsp_buff_sz;
 exit:
