@@ -2423,7 +2423,7 @@ uint32_t gsl_dp_get_avail_buffer_size(struct gsl_data_path_info *dp_info)
 
 static void gsl_clear_internal_buf(struct gsl_data_path_info *dp_info)
 {
-	uint8_t i = 0;
+	uint32_t i = 0;
 	uint32_t buf_idx = 0;
 	struct gsl_buff_internal *internal_buf = NULL;
 	gpr_packet_t *packet = NULL;
