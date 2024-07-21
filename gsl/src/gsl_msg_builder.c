@@ -79,7 +79,7 @@ int32_t gsl_msg_alloc_ext(uint32_t opcode, uint32_t src_port,
 		}
 
 		msg->payload = GPR_PKT_GET_PAYLOAD(uint8_t, msg->gpr_packet);
-		gsl_memset(msg->payload, 0, gpr_payload_size + oob_payload_size);
+		gsl_memset(msg->payload, 0, (size_t)gpr_payload_size + oob_payload_size);
 		msg->payload += gpr_payload_size;
 		gsl_memset(&msg->shmem, 0, sizeof(struct gsl_shmem_alloc_data));
 	} else {

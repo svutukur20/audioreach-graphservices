@@ -53,7 +53,7 @@ struct gsl_module_id_proc_info_entry {
 struct gsl_module_id_proc_info {
 	uint32_t num_procs; // number of processors in proc_module_list
 	uint32_t list_size; //size of proc_module_list
-	struct gsl_module_id_proc_info_entry* proc_module_list;
+	struct gsl_module_id_proc_info_entry *proc_module_list;
 	// list of module ids and tags sorted by processor id
 };
 
@@ -305,7 +305,7 @@ static uint32_t gsl_gpr_callback(gpr_packet_t *packet, void *cb_data)
 			break;
 		default:
 			/* free the packet if we will ignore it */
-			__gpr_cmd_free(packet);
+			gpr_rc = __gpr_cmd_free(packet);
 			break;
 		}
 		break;
@@ -1548,12 +1548,13 @@ cleanup:
 	return rc;
 }
 
-int32_t _gsl_graph_get_module_proc_tag_info(uint32_t* sg_id_list,
-	uint32_t num_sgs, uint32_t tag, struct gsl_module_id_proc_info **proc_module_info) {
+int32_t _gsl_graph_get_module_proc_tag_info(uint32_t *sg_id_list,
+	uint32_t num_sgs, uint32_t tag, struct gsl_module_id_proc_info **proc_module_info)
+{
 	AcdbGetProcTaggedModulesReq acdb_req;
 	AcdbGetProcTaggedModulesRsp acdb_rsp;
 	int32_t rc = AR_EOK;
-	struct gsl_module_id_proc_info* proc_mod_info;
+	struct gsl_module_id_proc_info *proc_mod_info;
 
 	acdb_req.num_sg_ids = num_sgs;
 	acdb_req.sg_ids = sg_id_list;
@@ -1599,7 +1600,7 @@ int32_t _gsl_graph_get_module_proc_tag_info(uint32_t* sg_id_list,
 	proc_mod_info->num_procs = acdb_rsp.num_procs;
 	proc_mod_info->list_size = acdb_rsp.list_size;
 	proc_mod_info->proc_module_list =
-		(struct gsl_module_id_proc_info_entry*)acdb_rsp.proc_tagged_module_list;
+		(struct gsl_module_id_proc_info_entry *)acdb_rsp.proc_tagged_module_list;
 	*proc_module_info = proc_mod_info;
 
 
@@ -2096,7 +2097,7 @@ static int32_t gsl_graph_set_sg_cal(struct gsl_graph *graph,
 	}
 
 	/* only update cached ckv if a new ckv was provided */
-	if (ckv) {
+	if (ckv && ckv->num_kvps) {
 		if (!gkv_node->ckv.kvp) {
 			gkv_node->ckv.kvp = gsl_mem_zalloc(
 				sizeof(struct gsl_key_value_pair) * ckv->num_kvps);
@@ -3672,7 +3673,7 @@ static int32_t gsl_graph_cache_datapath_miid(struct gsl_graph *graph,
 {
 	int32_t rc = AR_EOK;
 	struct gsl_sgid_list sg_id_list = {0, NULL};
-	struct gsl_module_id_proc_info* proc_module_info;
+	struct gsl_module_id_proc_info *proc_module_info;
 
 	if ((mode & GSL_ATTRIBUTES_DATAPATH_SETUP_MASK) >>
 		GSL_ATTRIBUTES_DATAPATH_SETUP_SHIFT
@@ -4563,7 +4564,7 @@ int32_t gsl_graph_change(struct gsl_graph *graph,
 	uint32_t i = 0;
 	int32_t rc = AR_EOK;
 	ar_list_node_t *curr = NULL;
-	bool is_gkv_node_added = false;
+	bool_t is_gkv_node_added = false;
 
 	/** Memory to hold GKV, CKV, sg_array and num_of_subgraphs */
 	gkv_node = gsl_mem_zalloc(sizeof(struct gsl_graph_gkv_node));
