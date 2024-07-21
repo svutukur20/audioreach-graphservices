@@ -1033,6 +1033,9 @@ int32_t gsl_shmem_free(struct gsl_shmem_alloc_data *alloc_data)
 	if (!alloc_data)
 		return AR_EBADPARAM;
 
+	if (!alloc_data->handle)
+		return AR_EBADPARAM;
+
 	page = alloc_data->handle;
 	master_proc_id = page->master_proc;
 	bin_idx = page->bin_idx;
@@ -1137,10 +1140,11 @@ int32_t gsl_shmem_unmap_extern_mem(struct gsl_shmem_alloc_data alloc_data)
 	struct gsl_shmem_page *page = alloc_data.handle;
 	uint32_t master_proc_id = 0;
 
-	if (!page) {
-		rc = AR_EBADPARAM;
-		goto exit;
-	}
+	if (!alloc_data.handle)
+		return AR_EBADPARAM;
+
+	if (!page)
+		return AR_EBADPARAM;
 
 	master_proc_id = page->master_proc;
 
