@@ -116,8 +116,8 @@ void tgws_get_server_address(uint16_t port, ar_socket_addr_storage_t* server_soc
 ============================================================================
 */
 
-TcpipGatewayServer::TcpipGatewayServer(std::string port, uint32_t option)
-	:str_pc_port{ port },
+TcpipGatewayServer::TcpipGatewayServer(std::string ip_addr, std::string port, uint32_t option)
+	: str_ip_addr { ip_addr }, str_pc_port{ port },
 	option{ option }
 {
 	struct ar_heap_info_t heap_inf =
@@ -251,7 +251,7 @@ void* TcpipGatewayServer::connect_routine(void* arg)
 	case TGWS_CONNECTION_OPTION_USB:
 		GATEWAY_INFO("Connecting to Gatway over usb");
 
-		status = ar_socket_get_addr_info(TGWS_IP_ADDRESS,
+		status = ar_socket_get_addr_info(str_ip_addr.c_str(),
 			config->port_str,
 			&socket_hints,
 			&connected_devices_addr_info);
@@ -345,7 +345,7 @@ void* TcpipGatewayServer::connect_routine(void* arg)
 		{
 			//do not create more threads if already connected.
 			//ar_osal_mutex_lock(connected_mutex);
-			//if (is_connected) 
+			//if (is_connected)
 			//{
 			//	ar_osal_mutex_unlock(connected_mutex);
 			//	GATEWAY_ERR("Detected a new connection request. Refusing...");
@@ -955,7 +955,7 @@ void tgws_get_client_address(uint16_t port, ar_socket_addr_storage_t* client_soc
 	client_sockaddr.sin_family = AF_INET;
 	inet_pton(
 		AF_INET,
-		TGWS_IP_ADDRESS,
+		str_ip_addr.c_str(),
 		&client_sockaddr.sin_addr.s_addr);
 	client_sockaddr.sin_port = htons((u_short)port);
 
@@ -983,7 +983,7 @@ void tgws_get_server_address(uint16_t port, ar_socket_addr_storage_t* server_soc
 	 //Windows
 	ar_socket_addr_in_t server_sockaddr = { 0 };
 	server_sockaddr.sin_family = AF_INET;
-	inet_pton(AF_INET, TGWS_IP_ADDRESS, &server_sockaddr.sin_addr.s_addr);
+	inet_pton(AF_INET, str_ip_addr.c_str(), &server_sockaddr.sin_addr.s_addr);
 	server_sockaddr.sin_port = htons(port);
 	//server_sockaddr.sin_port = htons(TCPIP_CMD_SERVER_PORT);
 	ar_mem_cpy(server_sock_addr, sizeof(ar_socket_addr_storage_t), &server_sockaddr, sizeof(ar_socket_addr_in_t));

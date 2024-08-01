@@ -4,12 +4,12 @@
 *==============================================================================
 *  \file tcpip_gateway_server.h
 *  \brief
-*                     T C P I P  G A T E W A Y  S E R V E R  
+*                     T C P I P  G A T E W A Y  S E R V E R
 *                             H E A D E R  F I L E
 *
-*         This file defines the class for the TCPIP Gateway Server as 
+*         This file defines the class for the TCPIP Gateway Server as
 *         well as types and defines used by the server. This server is
-*         a proxy server that forwards request from server clients to the 
+*         a proxy server that forwards request from server clients to the
 *         TCPIP CMD Server.
 *
 *  \cond
@@ -52,7 +52,7 @@
  /**< Timeout in seconds */
 #define TGWS_CONNECTION_TIMEOUT 30
  /**< The localhost address */
-#define TGWS_IP_ADDRESS "127.0.0.1"
+#define TGWS_DEFAULT_IP_ADDRESS "127.0.0.1"
  /**< 000.000.000.000 - 15 characteres plust null terminator */
 #define MAX_LENGTH_IP_ADDRESS 16
 
@@ -92,6 +92,7 @@ private:
     buffer_t recieve_buffer;
     uint16_t pc_port;
     std::string str_pc_port;
+    std::string str_ip_addr;
     tgws_config_t *config;
     ar_socket_t* server_socket_ptr;
     ar_socket_t *client_socket_ptr;
@@ -101,7 +102,7 @@ private:
     uint8_t is_connected;
     uint32_t option;
 public:
-    TcpipGatewayServer(std::string port, uint32_t option);
+    TcpipGatewayServer(std::string ip_addr, std::string port, uint32_t option);
     ~TcpipGatewayServer();
 
     /**
@@ -112,9 +113,9 @@ public:
 
     /**
     * \brief
-    *	  Starts the TCP/IP connection routine and waits to accept clients. 
-    * \detdesc 
-    *     Waits to accept clients. When clients connect the Gateway Server establishes a connection to the TCPIP CMD Server 
+    *	  Starts the TCP/IP connection routine and waits to accept clients.
+    * \detdesc
+    *     Waits to accept clients. When clients connect the Gateway Server establishes a connection to the TCPIP CMD Server
     */
     void* connect_routine(void* arg);
 
@@ -132,7 +133,7 @@ private:
 
     /**
     * \brief
-    *	  Forwards messages between the socket established between QACT and the Gateway Server 
+    *	  Forwards messages between the socket established between QACT and the Gateway Server
     *     and the socket established between the Gateway Server and TCPIP CMD Server
     *
     * \param [in] sender_socket_ptr: A pointer to the client socket. This is either the socket established with QACT or with the TCPIP CMD server
@@ -144,7 +145,7 @@ private:
     */
     void tcp_forward(
         ar_socket_t* sender_socket_ptr, ar_socket_t* receiver_socket_ptr,
-        buffer_t* gateway_message_buf, buffer_t* gateway_recv_buf, 
+        buffer_t* gateway_message_buf, buffer_t* gateway_recv_buf,
         bool_t is_cmd_request, tgws_status_codes_t &status_code);
 
     /**
@@ -162,7 +163,7 @@ private:
     * \param [in] sender_socket: The socket to send messages to
     * \param [in] service_cmd_id: The lemgth of the inbound message
     * \param [out] status_code: A gateway status code that the caller can use to handle gateway server specific errors
-    * 
+    *
     * \return AR_EOK on success, otherwise non-zero on failure
     */
     int32_t execute_server_command(

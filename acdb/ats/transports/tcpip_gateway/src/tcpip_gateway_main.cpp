@@ -7,7 +7,7 @@
 *
 * \brief
 *      The main entry point for the Gateway Server application
-* 
+*
 * \cond
 *  Copyright (c) Qualcomm Innovation Center, Inc. All rights reserved.
 *  SPDX-License-Identifier: BSD-3-Clause
@@ -37,19 +37,25 @@ int main(int argc, char *argv[])
 {
     int32_t status = AR_EOK;
     std::string pc_port = "";
+    std::string ip_addr = TGWS_DEFAULT_IP_ADDRESS;
 
     GATEWAY_ERR("Inside gateway main");//DEBUG
-    if (argc > 1)
+    if (argc == 2)
     {
         pc_port = argv[1];
-        GATEWAY_INFO("Specified Port: %s", pc_port.c_str());
+        GATEWAY_INFO("Specified IP: %s, Port: %s", ip_addr.c_str(), pc_port.c_str());
         size_t index = 0;
         g_pc_port = std::stoi(pc_port, &index);
+    } else if (argc == 3)
+    {
+        ip_addr = argv[1];
+        pc_port = argv[2];
+        GATEWAY_INFO("Specified IP: %s, Port: %s", ip_addr.c_str(), pc_port.c_str());
     }
 
-    /* TODO: For now only gateway over USB is supported until we can make 
+    /* TODO: For now only gateway over USB is supported until we can make
      * WIFI support cross-platform friendly */
-    TcpipGatewayServer gs{ pc_port , TGWS_CONNECTION_OPTION_USB };
+    TcpipGatewayServer gs{ ip_addr, pc_port , TGWS_CONNECTION_OPTION_USB };
     status = gs.run();
 
     return status;
