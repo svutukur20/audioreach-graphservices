@@ -8,7 +8,6 @@ AM_CFLAGS += -I ./api/apm
 AM_CFLAGS += -I ./api/ar_utils
 AM_CFLAGS += -I ./api/modules
 AM_CFLAGS += -I ./api/vcpm
-AM_CFLAGS += -I ./api/asps
 
 spf_sources = ./api/apm/apm_api.h \
                 ./api/apm/apm_api_version.h \
@@ -25,6 +24,10 @@ spf_sources = ./api/apm/apm_api.h \
                 ./api/ar_utils/ar_guids.h \
                 ./api/ar_utils/ar_ids.h \
                 ./api/ar_utils/ar_defs.h \
+                ./api/asps/asps_ads_usecase_api.h \
+                ./api/asps/asps_upd_usecase_api.h \
+                ./api/asps/asps_acd_usecase_api.h \
+                ./api/asps/asps_acm_api.h \
                 ./api/modules/aac_decoder_api.h \
                 ./api/modules/aac_encoder_api.h \
                 ./api/modules/acd_api.h \
@@ -127,11 +130,6 @@ spf_sources = ./api/apm/apm_api.h \
 
 spf_includedir = $(includedir)/spf
 spf_include_HEADERS = $(spf_sources)
-
-asps_sources =  ./api/asps/asps_ads_usecase_api.h \
-                ./api/asps/asps_upd_usecase_api.h \
-                ./api/asps/asps_acd_usecase_api.h \
-                ./api/asps/asps_acm_api.h
 
 asps_includedir = $(includedir)/spf/asps
 asps_include_HEADERS = $(asps_sources)
