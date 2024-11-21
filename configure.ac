@@ -70,6 +70,9 @@ fi
 
 AM_CONDITIONAL(USE_DUMMY_DIAG, test "x${with_dummy_diag}" = "xyes")
 
+AC_CHECK_FUNCS([strlcpy])
+AM_CONDITIONAL(USE_G_STR_FUNC, ! test "x$ac_cv_func_strlcpy" = "xyes")
+
 AC_CONFIG_FILES(
 Makefile
 spf/Makefile

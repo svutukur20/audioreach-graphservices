@@ -6,7 +6,11 @@ ACLOCAL_AMFLAGS = -I m4
 AM_CFLAGS = -Wall \
             -Wundef \
             -O2
-AM_CFLAGS += @GLIB_CFLAGS@ -Dstrlcpy=g_strlcpy -Dstrlcat=g_strlcat -include glib.h
+AM_CFLAGS += @GLIB_CFLAGS@ -include glib.h
+
+if USE_G_STR_FUNC
+AM_CFLAGS += -Dstrlcpy=g_strlcpy -Dstrlcat=g_strlcat
+endif
 
 AM_CFLAGS += -I$(top_srcdir)/ar_osal/api \
              -I$(top_srcdir)/acdb/api \
@@ -95,7 +99,11 @@ AM_CPPFLAGS += -I$(srcdir)/transports/tcpip_gateway/inc
 AM_CPPFLAGS += -I$(top_srcdir)/ar_osal/api
 AM_CPPFLAGS += -I$(top_srcdir)/acdb/ats/sockets/common/api/
 
-AM_CPPFLAGS += @GLIB_CFLAGS@ -Dstrlcpy=g_strlcpy -include glib.h
+AM_CPPFLAGS += @GLIB_CFLAGS@ -include glib.h
+
+if USE_G_STR_FUNC
+AM_CPPFLAGS += -Dstrlcpy=g_strlcpy -Dstrlcat=g_strlcat
+endif
 
 gateway_sources = ./transports/tcpip_gateway/src/tcpip_gateway_main.cpp \
                   ./transports/tcpip_gateway/src/tcpip_gateway_cmd_server.cpp \

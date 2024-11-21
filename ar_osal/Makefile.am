@@ -58,7 +58,11 @@ endif
 
 if USE_GLIB
 libar_osal_la_LIBADD += -lglib-2.0
-AM_CFLAGS += $(GLIB_CFLAGS) -D_GNU_SOURCE -Dstrlcat=g_strlcat -Dstrlcpy=g_strlcpy -include glib.h
+AM_CFLAGS += $(GLIB_CFLAGS) -D_GNU_SOURCE -include glib.h
+endif
+
+if USE_G_STR_FUNC
+AM_CFLAGS += -Dstrlcpy=g_strlcpy -Dstrlcat=g_strlcat
 endif
 
 lib_includedir = $(includedir)
