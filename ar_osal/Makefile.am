@@ -35,8 +35,15 @@ osal_c_sources = ./src/linux/ar_osal_file_io.c \
                  ./src/linux/ar_osal_string.c \
                  ./src/linux/ar_osal_thread.c \
                  ./src/linux/ar_osal_timer.c \
-		 ./src/linux/qcom/ar_osal_shmem_db.c \
-		  ./src/linux/qcom/ar_osal_servreg.c
+                 ./src/linux/qcom/ar_osal_servreg.c
+
+
+if AUDIO_DMA_SUPPORT
+osal_c_sources += ./src/linux/qcom/ar_osal_shmem_db.c
+else
+osal_c_sources += ./src/linux/qcom/ar_osal_shmem.c
+endif
+
 
 if USE_DUMMY_DIAG
 osal_c_sources += ./src/linux/ar_osal_stub_log_pkt_op.c
@@ -70,5 +77,11 @@ lib_include_HEADERS = $(osal_sources)
 lib_LTLIBRARIES = libar-osal.la
 libar_osal_la_CC = @CC@
 libar_osal_la_SOURCES = $(osal_c_sources)
-libar_osal_la_CFLAGS = $(AM_CFLAGS)
+libar_osal_la_CFLAGS = $(AM_CFLAGS) @DIAG_CFLAGS@
+
+if LIBION_SUPPORTED
+libar_osal_la_LIBADD += -lion
+libar_osal_la_CFLAGS += @LIBION_CFLAGS@
+endif
+
 libar_osal_la_LDFLAGS = -shared -avoid-version

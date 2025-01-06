@@ -70,6 +70,24 @@ fi
 
 AM_CONDITIONAL(USE_DUMMY_DIAG, test "x${with_dummy_diag}" = "xyes")
 
+AC_ARG_WITH([audio_dma_support],
+    AS_HELP_STRING([use audio_dma_support (default is no)]),
+    [with_audio_dma_support=$withval],
+    [with_audio_dma_support=no])
+AM_CONDITIONAL([AUDIO_DMA_SUPPORT], [test "x${with_audio_dma_support}" = "xyes"])
+
+AC_ARG_WITH([libion],
+    AS_HELP_STRING([use libion (default is no)]),
+    [with_libion=$withval],
+    [with_libion=no])
+
+if (test "x${with_libion}" = "xyes"); then
+    PKG_CHECK_MODULES([LIBION], [libion])
+    AC_SUBST([LIBION_CFLAGS])
+fi
+
+AM_CONDITIONAL([LIBION_SUPPORTED], [test "x${with_libion}" = "xyes"])
+
 AC_CHECK_FUNCS([strlcpy])
 AM_CONDITIONAL(USE_G_STR_FUNC, ! test "x$ac_cv_func_strlcpy" = "xyes")
 
