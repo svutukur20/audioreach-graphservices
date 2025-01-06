@@ -6292,7 +6292,7 @@ int32_t AcdbCmdGetSubgraphCalDataNonPersist(AcdbSgIdCalKeyVector *req,
     if (num_subgraph_found == 0)
     {
         status = AR_ENOTEXIST;
-        ACDB_ERR("Error[%d]: No calibration found", status);
+        ACDB_DBG("Error[%d]: No calibration found", status);
     }
 
     //Clean Up Context Info
