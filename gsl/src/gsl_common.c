@@ -160,11 +160,12 @@ int32_t gsl_send_spf_cmd(gpr_packet_t **packet, struct gsl_signal *sig_p,
 	uint32_t src_port = (*packet)->src_port,
 		dst_port = (*packet)->dst_port;
 	#endif
-
-	INSERT_DEBUG_TOKEN((*packet)->token, debug_token);
-	++debug_token;
-        if(sig_p == NULL)
-            GSL_VERBOSE("sending pkt opcode 0x%x token 0x%08x", opcode, (*packet)->token);
+	if(opcode != APM_CMD_REGISTER_MODULE_EVENTS) {
+		INSERT_DEBUG_TOKEN((*packet)->token, debug_token);
+		++debug_token;
+        	if(sig_p == NULL)
+    	        GSL_VERBOSE("sending pkt opcode 0x%x token 0x%08x", opcode, (*packet)->token);
+	}
 
 	rc = __gpr_cmd_async_send(*packet);
 	if (rc) {
@@ -188,8 +189,10 @@ int32_t gsl_send_spf_cmd(gpr_packet_t **packet, struct gsl_signal *sig_p,
 				&spf_status, rsp_pkt);
 		}
 
-		GSL_DBG("rcvd pkt token : 0x%x", (*packet)->token);
-		REMOVE_DEBUG_TOKEN((*packet)->token);
+		if (opcode != APM_CMD_REGISTER_MODULE_EVENTS) {
+			GSL_DBG("rcvd pkt token : 0x%x", (*packet)->token);
+			REMOVE_DEBUG_TOKEN((*packet)->token);
+		}
 		GSL_DBG("Wait done rc[0x%x] opcd[0x%x] src_prt[0x%x] dst_prt[0x%x]",
 			rc, opcode, src_port, dst_port);
 		GSL_DBG("flags[0x%x] spf_status[0x%x]",	ev_flags, spf_status);
