@@ -42,6 +42,103 @@ typedef enum lpaif_type_t
    Type definitions
 ==============================================================================*/
 
+/** Parameter used to configure the Silence detection for the CODEC DMA Interface 
+		To be notified of the detection status, client can register with the codec dma source module using EVENT_ID_SILENCE_DETECTION.
+*/
+#define PARAM_ID_SILENCE_DETECTION								0x08001AC2
+
+/** @h2xmlp_parameter   {"PARAM_ID_SILENCE_DETECTION",
+                          PARAM_ID_SILENCE_DETECTION}
+    @h2xmlp_description {Configures the Silence detection param for the CODEC DMA Interface.
+	To be notified of the detection status, client can register with the codec dma source module using EVENT_ID_SILENCE_DETECTION. }
+    @h2xmlp_toolPolicy  {NO_SUPPORT} */
+
+#include "spf_begin_pack.h"
+/** Payload for parameter PARAM_ID_SILENCE_DETECTION */
+struct param_id_silence_detection_t
+{
+	uint32_t enable_detection;
+	/**< @h2xmle_description {Indicates if Silence detection is enabled/disabled}
+	       @h2xmle_range       {0,1}
+	       @h2xmle_default     {0} */
+
+	uint32_t detection_duration_ms;
+	/**< @h2xmle_description {Continuous silence duration of mic signal that is required to confirm silence detection}
+	       @h2xmle_range       {1000..30000}
+	       @h2xmle_default     {3000} */
+}
+#include "spf_end_pack.h"
+;
+typedef struct param_id_silence_detection_t param_id_silence_detection_t;
+
+
+/**
+ Payload for silence detection status.
+*/
+#include "spf_begin_pack.h"
+struct event_cfg_silence_detection_status_t
+{
+   uint32_t status_ch_mask;
+   /**< Current silence detection status mask for groups of 32 channels */
+
+   /*#< @h2xmle_description       {Current silence detection status mask for groups of 
+                                   32 channels based on num_32_channel_group.
+								   Here nth channel status will be present at n-1 th bit.
+                                   If num_32_channel_group = 1, the status includes channels 1-32
+                                   If num_32_channel_group = 2, the status includes channels 33-64 etc.}
+        @h2xmle_policy            {Basic} */
+}
+#include "spf_end_pack.h"
+;
+
+typedef struct event_cfg_silence_detection_status_t event_cfg_silence_detection_status_t;
+
+
+/** Identifier of the silence detection event from CODEC DMA module.
+    Payload of the configuration that the client is to register with the module
+    through APM_CMD_REGISTER_MODULE_EVENTS
+    event_cfg_silence_detection_t
+	The events are raised based on the configuration provided using PARAM_ID_SILENCE_DETECTION
+ */
+#define EVENT_ID_SILENCE_DETECTION 								0x08001AC3
+/** @h2xmlp_parameter   {"EVENT_ID_SILENCE_DETECTION",
+                          EVENT_ID_SILENCE_DETECTION}
+    @h2xmlp_description {ID of the event raised by codec DMA module based on configuration provided using PARAM_ID_SILENCE_DETECTION. }
+    @h2xmlp_toolPolicy  {NO_SUPPORT} */
+
+/** Payload of the #EVENT_ID_SILENCE_DETECTION event.
+*/
+
+#include "spf_begin_pack.h"
+#include "spf_begin_pragma.h"
+struct event_cfg_silence_detection_t
+{
+   uint32_t num_32_channel_group;
+   /**< Number of silence detection 32 channel groups. 
+		If num_32_channel_group=1 then status contain information of 32 channels.
+		If num_32_channel_group=2 then status contain information of 64 channels etc.
+		*/
+
+   /*#< @h2xmle_description {Number of silence detection 32 channel groups. 
+							 If num_32_channel_group=1 then then status contain information of 32 channels.
+							 If num_32_channel_group=2 then status contain information of 64 channels etc.}
+        @h2xmle_default     {0}
+        @h2xmle_range       {0..0xFFFFFFFF}
+        @h2xmle_policy      {Basic} */
+#if defined(__H2XML__)
+   event_cfg_silence_detection_status_t detections[0];
+   /**< Array of silence detection status of size num_32_channel_group. */
+   /*#< @h2xmle_description       {Array of silence detection status of size
+                                   num_32_channel_group.}
+        @h2xmle_variableArraySize {num_32_channel_group}
+        @h2xmle_policy            {Basic} */
+   
+#endif   
+}
+#include "spf_end_pragma.h"
+#include "spf_end_pack.h"
+;
+typedef struct event_cfg_silence_detection_t event_cfg_silence_detection_t;
 /** ID of the parameter used to configure the HW endpoint media format */
 #define PARAM_ID_HW_EP_MF_CFG                               0x08001017
 
