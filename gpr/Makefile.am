@@ -67,6 +67,11 @@ if CUTILS_SUPPORTED
 libar_gpr_la_LIBADD += -lcutils
 AM_CFLAGS += -DGPR_USE_CUTILS
 endif
+
+if USE_ARE_ON_APPS
+AM_CFLAGS += -DARE_ON_APPS
+endif
+
 libar_gpr_la_SOURCES = $(gpr_c_sources)
 libar_gpr_la_CFLAGS = $(AM_CFLAGS)
 libar_gpr_la_LDFLAGS = -shared -avoid-version

@@ -91,6 +91,12 @@ AM_CONDITIONAL([LIBION_SUPPORTED], [test "x${with_libion}" = "xyes"])
 AC_CHECK_FUNCS([strlcpy])
 AM_CONDITIONAL(USE_G_STR_FUNC, ! test "x$ac_cv_func_strlcpy" = "xyes")
 
+AC_ARG_WITH([are_on_apps],
+    AS_HELP_STRING([--with-are-on-apps],[Enable ARE (SPF) on APPS support (default is no)]),
+    [with_are_on_apps=$withval],
+    [with_are_on_apps=no])
+AM_CONDITIONAL([USE_ARE_ON_APPS], [test "x${with_are_on_apps}" = "xyes"])
+
 AC_CONFIG_FILES(
 Makefile
 spf/Makefile
