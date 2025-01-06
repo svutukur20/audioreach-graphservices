@@ -135,8 +135,8 @@ asps_includedir = $(includedir)/spf/asps
 asps_include_HEADERS = $(asps_sources)
 
 #LIBRARY for LE apps
-lib_LTLIBRARIES = libspfheaders.la
-libspfheaders_la_CC = @CC@
-libspfheaders_la_SOURCES = $(spf_sources)
-libspfheaders_la_CFLAGS = $(AM_CFLAGS)
-libspfheaders_la_LDFLAGS = -shared -avoid-version
+lib_LTLIBRARIES = libar-spfhdrs.la
+libar_spfhdrs_la_CC = @CC@
+libar_spfhdrs_la_SOURCES = $(spf_sources)
+libar_spfhdrs_la_CFLAGS = $(AM_CFLAGS)
+libar_spfhdrs_la_LDFLAGS = -shared -avoid-version

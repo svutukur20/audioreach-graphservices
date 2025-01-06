@@ -63,7 +63,7 @@ endif
 
 lib_includedir = $(includedir)
 lib_include_HEADERS = $(osal_sources)
-lib_LTLIBRARIES = libar_osal.la
+lib_LTLIBRARIES = libar-osal.la
 libar_osal_la_CC = @CC@
 libar_osal_la_SOURCES = $(osal_c_sources)
 libar_osal_la_CFLAGS = $(AM_CFLAGS)

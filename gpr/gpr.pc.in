@@ -6,5 +6,5 @@ includedir=@includedir@
 Name: gpr
 Description: gpr library
 Version: @VERSION@
-Libs: -L${libdir} -lgpr
+Libs: -L${libdir} -lar-gpr
 Cflags: -I${includedir}

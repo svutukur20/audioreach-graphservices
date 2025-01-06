@@ -59,12 +59,12 @@ lib_includedir = $(includedir)
 lib_include_HEADERS = $(ats_headers)
 requiredlibs = -lrt
 
-lib_LTLIBRARIES = libats.la
-libats_la_CC = @CC@
-libats_la_LIBADD = -lar_osal -L$(top_builddir)/ar_osal
-libats_la_LIBADD += -lacdb -L$(top_builddir)/acdb
+lib_LTLIBRARIES = libar-ats.la
+libar_ats_la_CC = @CC@
+libar_ats_la_LIBADD = -lar-osal -L$(top_builddir)/ar_osal
+libar_ats_la_LIBADD += -lar-acdb -L$(top_builddir)/acdb
 if CUTILS_SUPPORTED
-libats_la_LIBADD += -lcutils
+libar_ats_la_LIBADD += -lcutils
 AM_CFLAGS += -DAR_ATS_USE_CUTILS
 endif
 
@@ -75,17 +75,17 @@ else
 AM_CFLAGS += @DIAG_CFLAGS@
 AM_CPPFLAGS += -DFEATURE_LE_DIAG
 requiredlibs += @DIAG_LIBS@
-libats_la_LIBADD += @DIAG_LIBS@
+libar_ats_la_LIBADD += @DIAG_LIBS@
 endif
 
-libats_la_SOURCES = $(ats_c_sources)
-libats_la_CFLAGS = $(AM_CFLAGS)
-libats_la_CPPFLAGS = $(AM_CPPFLAGS)
+libar_ats_la_SOURCES = $(ats_c_sources)
+libar_ats_la_CFLAGS = $(AM_CFLAGS)
+libar_ats_la_CPPFLAGS = $(AM_CPPFLAGS)
 if USES_ATS_TRANSPORT_TCPIP
-libats_la_CFLAGS += -DATS_TRANSPORT_TCPIP
-libats_la_CPPFLAGS += -DATS_TRANSPORT_TCPIP
+libar_ats_la_CFLAGS += -DATS_TRANSPORT_TCPIP
+libar_ats_la_CPPFLAGS += -DATS_TRANSPORT_TCPIP
 endif
-libats_la_LDFLAGS = -shared -avoid-version
+libar_ats_la_LDFLAGS = -shared -avoid-version
 
 AM_CPPFLAGS += -DSOCK_PATH='"/usr/bin/gateway/ats_sockets"' \
         -DSOCK_PATH_SERVER='"/usr/bin/gateway/ats_sockets/unix_sock.server"' \
@@ -104,5 +104,5 @@ gateway_sources = ./transports/tcpip_gateway/src/tcpip_gateway_main.cpp \
 bin_PROGRAMS = ats_gateway
 ats_gateway_CC = @CC@
 ats_gateway_SOURCES = $(gateway_sources)
-ats_gateway_LDADD = $(top_builddir)/ar_osal/libar_osal.la
+ats_gateway_LDADD = $(top_builddir)/ar_osal/libar-osal.la
 ats_gateway_CPPFLAGS = $(AM_CPPFLAGS)

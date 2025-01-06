@@ -19,7 +19,7 @@ util_c_sources = src/ar_util_data_log.c \
                  src/ar_util_err_detection.c \
                  src/ar_util_list.c
 
-lib_LTLIBRARIES = libar_util.la
+lib_LTLIBRARIES = libar-util.la
 libar_util_la_CC = @CC@
 libar_util_la_SOURCES = $(util_c_sources)
 libar_util_la_CFLAGS = $(AM_CFLAGS)

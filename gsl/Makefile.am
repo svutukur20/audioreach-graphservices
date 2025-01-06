@@ -50,9 +50,9 @@ gsl_c_sources = ./src/gsl_graph.c \
 lib_includedir = $(includedir)
 lib_include_HEADERS = $(gsl_sources)
 
-lib_LTLIBRARIES = libar_gsl.la
+lib_LTLIBRARIES = libar-gsl.la
 libar_gsl_la_CC = @CC@
-libar_gsl_la_LIBADD = $(top_builddir)/acdb/libacdb.la $(top_builddir)/ar_osal/libar_osal.la $(top_builddir)/ar_util/libar_util.la $(top_builddir)/spf/libspfheaders.la $(top_builddir)/gpr/libgpr.la
+libar_gsl_la_LIBADD = $(top_builddir)/acdb/libar-acdb.la $(top_builddir)/ar_osal/libar-osal.la $(top_builddir)/ar_util/libar-util.la $(top_builddir)/spf/libar-spfhdrs.la $(top_builddir)/gpr/libar-gpr.la
 libar_gsl_la_SOURCES = $(gsl_c_sources)
 libar_gsl_la_CFLAGS = $(AM_CFLAGS)
 libar_gsl_la_LDFLAGS = -shared -avoid-version
