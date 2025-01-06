@@ -26,9 +26,9 @@ extern "C" {
 #ifdef ASPS_USECASE_ID_PCM_DATA /* definitions specific to PCM DATA usecase */
 
 /**
-   PCM DATA usecase(ASPS_USECASE_ID_PCM_DATA) sepcific payload. This payload contains the
+   PCM DATA usecase(ASPS_USECASE_ID_PCM_DATA) specific payload. This payload contains the
    type of the stream required by the sensor.
-   This structure is preceeded by param_id_asps_sensor_usecase_register_t structure. */
+   This structure is proceeded by param_id_asps_sensor_usecase_register_t structure. */
 
 #include "spf_begin_pack.h"
 #include "spf_begin_pragma.h"
@@ -45,9 +45,49 @@ typedef struct asps_pcm_data_usecase_register_payload_t asps_pcm_data_usecase_re
 
 #endif /* ASPS_USECASE_ID_PCM_DATA */
 
-#ifdef ASPS_USECASE_ID_PCM_DATA /* definitions specific to PCM DATA usecase */
+/*ADS usecase ID */
+#define ASPS_USECASE_ID_PCM_DATA_V2 0x0B00100C
 
-/** PCM DATA usecase (ASPS_USECASE_ID_PCM_DATA) specific Payload structure. This structure is preceeded
+/**
+   PCM DATA usecase(ASPS_USECASE_ID_PCM_DATA_V2) specific payload. This payload contains the
+   type of the stream required by the sensor.
+   This structure is proceeded by param_id_asps_sensor_usecase_register_t structure. */
+
+#include "spf_begin_pack.h"
+#include "spf_begin_pragma.h"
+struct asps_pcm_data_v2_usecase_register_payload_t
+{
+	 uint32_t stream_type;
+	 /* stream type for pcm data takes values {0,1,2}
+	  * 0 : INVALID, 1 : STREAM_TYPE_PCM_RAW, 2 : STREAM_TYPE_PCM_NS */
+
+	 uint32_t requires_buffering;
+	 /* indicates whether the capture use case requires a buffering module
+	  * in the chain */
+
+	uint32_t sample_rate;
+	/* sampling rate of pcm data at end point */
+
+	uint32_t bit_width;
+	/* bit width of pcm data at end point
+	 * currently supports only 16 bit	*/
+
+	uint32_t num_channels;
+	/* number of channels takes values from {0..32} */
+
+#if 0
+	uint8_t channel_type[0];
+	/* channel type for each channel in num_channels
+	 * variable array of size num_channels elements
+	 * takes values from {0..63} */
+#endif
+}
+#include "spf_end_pragma.h"
+#include "spf_end_pack.h"
+;
+typedef struct asps_pcm_data_v2_usecase_register_payload_t asps_pcm_data_v2_usecase_register_payload_t;
+
+/** PCM DATA usecase (ASPS_USECASE_ID_PCM_DATA/V2) specific Payload structure. This structure is proceeded
     by event_id_asps_sensor_usecase_info_t. */
 
 #include "spf_begin_pack.h"
@@ -68,8 +108,6 @@ struct asps_audio_data_usecase_register_ack_payload_t
 #include "spf_end_pack.h"
 ;
 typedef struct asps_audio_data_usecase_register_ack_payload_t asps_audio_data_usecase_register_ack_payload_t;
-
-#endif /* ASPS_USECASE_ID_PCM_DATA */
 
 #ifdef __cplusplus
 }
