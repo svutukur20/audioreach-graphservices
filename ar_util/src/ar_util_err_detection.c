@@ -40,7 +40,6 @@ struct err_det_ctxt {
 	ar_list_node_t node;
 
 	uint32_t master_proc_handle;
-	uint32_t restart_cnt;
 	uint64_t last_restart_time_ms;
 
 	uint32_t num_timeouts_curr_period;
@@ -155,8 +154,6 @@ int32_t ar_err_det_reset_ctxt(uint32_t proc_handle)
 	ctxt->num_timeouts_curr_period = 0;
 	ctxt->first_eduplicate_time_ms = 0;
 	ctxt->num_eduplicate_curr_period = 0;
-	ctxt->last_restart_time_ms = ar_timer_get_time_in_ms();
-	ctxt->restart_cnt++;
 
 	return AR_EOK;
 }
@@ -248,7 +245,7 @@ int32_t ar_err_det_detect_spf_error(uint32_t proc_handle, int32_t err_code,
 			ctxt->num_eduplicate_curr_period = 1;
 		}
 
-		if (*do_restart && ctxt->restart_cnt) {
+		if (*do_restart) {
 			/* not all 1 if to avoid calculating this sum when no rc*/
 			sum = overflow_safe_add(ctxt->last_restart_time_ms, MIN_TIME_EDUPLICATE_RESTART_MS);
 			if (curr_time < sum) {
@@ -264,12 +261,14 @@ int32_t ar_err_det_detect_spf_error(uint32_t proc_handle, int32_t err_code,
 	 * that some time has passed since the last restart and avoid restarting if
 	 * it's still too soon since.
 	 */
-	if (*do_restart && ctxt->restart_cnt) {
+	if (*do_restart) {
 		/* not all 1 if to avoid calculating this sum when no rc*/
 		sum = overflow_safe_add(ctxt->last_restart_time_ms, MIN_TIME_ANY_RESTART_MS);
 		if (curr_time < sum) {
 			AR_ERR_DET_INFO("Last restart too recent. Silencing detected error");
 			*do_restart = false;
+		} else {
+			ctxt->last_restart_time_ms = curr_time;
 		}
 	}
 
