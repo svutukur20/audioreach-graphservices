@@ -11,7 +11,7 @@
  */
 
 #define AR_OSAL_SERVREG_TAG    "COSR"
-
+#include <errno.h>
 #include "ar_osal_types.h"
 #include "ar_osal_servreg.h"
 #include "ar_osal_mutex.h"
