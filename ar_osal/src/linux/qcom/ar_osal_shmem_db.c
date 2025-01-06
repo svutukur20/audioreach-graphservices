@@ -685,6 +685,7 @@ int32_t ar_shmem_deinit(void)
 
   if (pdata == NULL) {
     AR_LOG_ERR(AR_OSAL_SHMEM_LOG_TAG,"%s not in init state\n", __func__);
+    pthread_mutex_unlock(&ar_shmem_lock);
     return AR_EOK;
   }
 
