@@ -125,7 +125,7 @@ struct event_cfg_silence_detection_t
         @h2xmle_default     {0}
         @h2xmle_range       {0..0xFFFFFFFF}
         @h2xmle_policy      {Basic} */
-#if defined(__H2XML__)
+
    event_cfg_silence_detection_status_t detections[0];
    /**< Array of silence detection status of size num_32_channel_group. */
    /*#< @h2xmle_description       {Array of silence detection status of size
@@ -133,7 +133,6 @@ struct event_cfg_silence_detection_t
         @h2xmle_variableArraySize {num_32_channel_group}
         @h2xmle_policy            {Basic} */
    
-#endif   
 }
 #include "spf_end_pragma.h"
 #include "spf_end_pack.h"
