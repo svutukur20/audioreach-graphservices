@@ -63,7 +63,7 @@ int32_t ar_fopen(_Out_ ar_fhandle *handle,
     case AR_FOPEN_WRITE_ONLY:
         file_mode = "wb";
         break;
-    case AR_FOPEN_READ_WRITE:
+    case AR_FOPEN_READ_ONLY_WRITE:
         file_mode = "r+";
         break;
     case AR_FOPEN_APPEND:
@@ -75,7 +75,7 @@ int32_t ar_fopen(_Out_ ar_fhandle *handle,
     case AR_FOPEN_READ_WRITE_APPEND:
         file_mode = "a+";
         break;
-    case AR_FOPEN_READ_ONLY_WRITE:
+    case AR_FOPEN_READ_WRITE:
         file_mode = "w+";
         fileptr = fopen(path, "r");
         if(fileptr){
