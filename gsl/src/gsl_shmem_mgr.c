@@ -305,7 +305,7 @@ static int32_t gsl_shmem_map_page_to_spf(struct gsl_shmem_page *page,
 	 */
 	if ((gsl_spf_ss_state_get(master_proc_id) & spf_ss_map_mask) !=
 		spf_ss_map_mask)
-			return AR_ESUBSYSRESET;
+			return AR_ENOTREADY;
 
 	/* first map to master (assumed to be adsp currently) */
 	if (GSL_TEST_SPF_SS_BIT(spf_ss_map_mask, master_proc_id)) {

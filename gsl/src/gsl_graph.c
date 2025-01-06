@@ -2854,7 +2854,7 @@ static int32_t gsl_graph_open_sgids_and_connections(struct gsl_graph *graph,
 		if ((gsl_spf_ss_state_get(graph->proc_id) & gkv_node->spf_ss_mask)
 			!= gkv_node->spf_ss_mask) {
 
-			rc = AR_ESUBSYSRESET;
+			rc = AR_ENOTREADY;
 			goto free_sg_prop_data;
 		}
 
