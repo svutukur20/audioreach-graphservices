@@ -12,11 +12,8 @@ include $(CLEAR_VARS)
 #                 Common definitons
 #----------------------------------------------------------------------------
 
-osal-def += -D_ANDROID_ -DAR_OSAL_USE_CUTILS
+osal-def += -D_ANDROID_ -DAR_OSAL_USE_CUTILS -DPROPERTY_TRIGGER
 
-ifeq ($(strip $(AUDIO_FEATURE_ENABLED_AGM_HIDL)),true)
-  osal-def += -DPROPERTY_TRIGGER
-endif
 #----------------------------------------------------------------------------
 #             Make the Shared library (liblx-osal)
 #----------------------------------------------------------------------------
