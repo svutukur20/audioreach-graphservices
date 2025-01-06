@@ -108,6 +108,11 @@ struct gsl_glbl_persist_cal *gsl_global_persist_cal_pool_add(uint32_t cal_id,
 	/* check if cal_id already exists in the pool */
 	ar_list_for_each_entry(curr, &gpc_pool.cal_list) {
 		curr_gpc = get_container_base(curr, struct gsl_glbl_persist_cal, node);
+		if (!curr_gpc) {
+			GSL_ERR("null returned for curr_gpc\n");
+			goto exit;
+		}
+
 		if (curr_gpc->cal_id == cal_id) {
 			cal_found = 1;
 			break;

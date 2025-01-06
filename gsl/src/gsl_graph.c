@@ -142,7 +142,7 @@ static void gsl_graph_remove_gkv_from_list(struct gsl_graph *graph,
 static struct gsl_subgraph **gsl_graph_get_sg_array(struct gsl_graph *graph,
 	uint32_t *num_sgs)
 {
-	ar_list_node_t *curr;
+	ar_list_node_t *curr = NULL;
 	struct gsl_graph_gkv_node *gkv_node;
 	uint32_t total_num_of_subgraphs = 0, num_of_subgraphs = 0, i;
 	uint32_t num_sg_to_compare = 0;
@@ -3378,7 +3378,7 @@ int32_t gsl_graph_set_config(struct gsl_graph *graph,
 {
 	int32_t rc = AR_EOK;
 	struct gsl_sgid_list sg_id_list = {0, NULL};
-	ar_list_node_t *curr;
+	ar_list_node_t *curr = NULL;
 	struct gsl_graph_gkv_node *gkv_node = NULL;
 	bool_t is_found = FALSE;
 	uint32_t i = 0;
@@ -3519,7 +3519,7 @@ int32_t gsl_graph_set_cal(struct gsl_graph *graph,
 {
 	int32_t rc = AR_EOK;
 	struct gsl_sgid_list sg_id_list = {0, NULL};
-	ar_list_node_t *curr;
+	ar_list_node_t *curr = NULL;
 	struct gsl_graph_gkv_node *gkv_node = NULL;
 	bool_t is_found = FALSE;
 	uint32_t i = 0;
@@ -3820,6 +3820,11 @@ int32_t gsl_graph_start(struct gsl_graph *graph,
 	GSL_MUTEX_LOCK(lock);
 	ar_list_for_each_entry(curr, &graph->gkv_list) {
 		gkv_node = get_container_base(curr, struct gsl_graph_gkv_node, node);
+		if (!gkv_node) {
+			GSL_ERR("null returned for gkv_node\n");
+			rc = AR_EBADPARAM;
+			goto unlock_mutex;
+		}
 		if (gkv_node->num_of_subgraphs ==
 			count_set_bits(gkv_node->sg_start_mask))
 			continue;
@@ -3917,6 +3922,7 @@ free_msg:
 	gsl_graph_update_state(graph, GRAPH_STARTED);
 unlock_mutex:
 	GSL_MUTEX_UNLOCK(lock);
+
 	return rc;
 }
 
@@ -3924,7 +3930,7 @@ int32_t gsl_graph_stop_with_properties(struct gsl_graph *graph,
 	struct gsl_cmd_properties *stop_props, ar_osal_mutex_t lock)
 {
 	struct gsl_key_vector *gkv = &stop_props->gkv;
-	ar_list_node_t *curr;
+	ar_list_node_t *curr = NULL;
 	struct gsl_graph_gkv_node *gkv_node = NULL;
 	bool_t is_found = FALSE;
 	int32_t rc = AR_EOK;
@@ -3980,6 +3986,11 @@ int32_t gsl_graph_suspend(struct gsl_graph *graph,
 	ar_list_for_each_entry(curr, &graph->gkv_list) {
 		gkv_node = get_container_base(curr, struct gsl_graph_gkv_node,
 			node);
+		if (!gkv_node) {
+			GSL_ERR("null returned for gkv_node\n");
+			rc = AR_EBADPARAM;
+			goto exit;
+		}
 		if (gkv_node->sg_start_mask) {
 			/**< some or all of the SGs are started within this GKV */
 			rc = gsl_graph_suspend_single_gkv(graph, gkv_node);
@@ -4052,6 +4063,11 @@ int32_t gsl_graph_stop(struct gsl_graph *graph,
 	ar_list_for_each_entry(curr, &graph->gkv_list) {
 		gkv_node = get_container_base(curr, struct gsl_graph_gkv_node,
 			node);
+		if (!gkv_node) {
+			GSL_ERR("null returned for gkv_node\n");
+			rc = AR_EBADPARAM;
+			goto unlock_mutex;
+		}
 		{
 			/**< some or all of the SGs are started within this GKV */
 			rc = gsl_graph_stop_single_gkv(graph, gkv_node, NULL);
@@ -4434,7 +4450,7 @@ int32_t gsl_graph_close_with_properties(struct gsl_graph *graph,
 	struct gsl_cmd_properties *props, ar_osal_mutex_t lock)
 {
 	struct gsl_key_vector *gkv;
-	ar_list_node_t *curr;
+	ar_list_node_t *curr = NULL;
 	struct gsl_graph_gkv_node *gkv_node = NULL;
 
 	bool_t is_found = FALSE;
@@ -4506,7 +4522,7 @@ int32_t gsl_graph_remove_old(struct gsl_graph *graph,
 	struct gsl_cmd_remove_graph *old_graph,
 	ar_osal_mutex_t oc_lock, ar_osal_mutex_t ss_lock)
 {
-	ar_list_node_t *curr;
+	ar_list_node_t *curr = NULL;
 	struct gsl_graph_gkv_node *gkv_node = NULL;
 	bool_t is_found = FALSE;
 	int32_t rc = AR_EOK;

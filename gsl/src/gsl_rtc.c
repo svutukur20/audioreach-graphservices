@@ -31,7 +31,7 @@ static struct gsl_rtc_internal_ctxt {
 static struct gsl_subgraph *gsl_graph_get_sg_ptr(struct gsl_graph *graph,
 	uint32_t sg_id)
 {
-	ar_list_node_t *curr;
+	ar_list_node_t *curr = NULL;;
 	struct gsl_graph_gkv_node *gkv_node;
 	uint32_t i = 0;
 
@@ -139,7 +139,7 @@ uint32_t gsl_rtc_graph_copy_gkvs(struct gsl_graph *graph, uint8_t *payload,
 {
 	uint32_t gkv_bytes = 0;
 	struct gsl_rtc_key_vector *gkv;
-	ar_list_node_t *curr;
+	ar_list_node_t *curr = NULL;;
 	struct gsl_graph_gkv_node *gkv_node;
 
 	*num_gkvs = 0;
@@ -168,7 +168,7 @@ uint32_t gsl_rtc_graph_copy_ckvs(struct gsl_graph *graph, uint8_t *payload,
 {
 	uint32_t ckv_bytes = 0;
 	struct gsl_rtc_key_vector *ckv;
-	ar_list_node_t *curr;
+	ar_list_node_t *curr = NULL;;
 	struct gsl_graph_gkv_node *gkv_node;
 
 	*num_ckvs = 0;
@@ -194,7 +194,7 @@ uint32_t gsl_rtc_graph_copy_ckvs(struct gsl_graph *graph, uint8_t *payload,
 
 uint32_t gsl_rtc_graph_get_gkv_ckv_size(struct gsl_graph *graph)
 {
-	ar_list_node_t *curr;
+	ar_list_node_t *curr = NULL;;
 	struct gsl_graph_gkv_node *gkv_node;
 	uint32_t gkv_node_size = 0;
 

@@ -69,6 +69,10 @@ uint32_t gsl_subgraph_add_children(struct gsl_subgraph *sg,
 		is_found = 0;
 		ar_list_for_each_entry(itr, &sg->children) {
 			child = get_container_base(itr, struct gsl_child_sg, node);
+			if (!child) {
+				GSL_ERR("null returned for child\n");
+				return AR_EBADPARAM;
+			}
 			if (child->sg_id == child_sgids->dst_sg_ids[i]) {
 				/* child already exists */
 				++child->ref_cnt;
@@ -130,6 +134,10 @@ uint32_t gsl_subgraph_remove_children(struct gsl_subgraph *sg,
 		/* check if child already exists */
 		ar_list_for_each_entry(itr, &sg->children) {
 			child = get_container_base(itr, struct gsl_child_sg, node);
+			if (!child) {
+				GSL_ERR("null returned for child\n");
+				return AR_EBADPARAM;
+			}
 			if (child->sg_id != child_sgids->dst_sg_ids[i])
 				continue;
 			/*
