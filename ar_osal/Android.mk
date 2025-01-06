@@ -52,7 +52,7 @@ LOCAL_SRC_FILES += src/linux/qcom/ar_osal_log_pkt_op.c \
                    src/linux/qcom/ar_osal_servreg.c
 
 ifeq ($(TARGET_KERNEL_VERSION),$(filter $(TARGET_KERNEL_VERSION), 4.14 4.19 5.4))
-LOCAL_SRC_FILES += src/linux/qcom/ar_osal_shmem.c
+LOCAL_SRC_FILES += src/linux/qcom/ar_osal_shmem_ion.c
 else
 LOCAL_SRC_FILES += src/linux/qcom/ar_osal_shmem_db.c
 endif
