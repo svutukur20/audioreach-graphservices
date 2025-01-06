@@ -228,6 +228,12 @@ void *receiver_thread_loop(void *priv_data)
         if (poll(pfd, NUM_FDS, -1) < 0) {
             /*Poll errored out, treat it as a fatal error bail out*/
             int error = errno;
+           /**
+            * Continue polling if poll error is EINTR
+            */
+            if (error == EINTR)
+                continue;
+
             AR_LOG_ERR(LOG_TAG,"Poll failed error %s", strerror(error));
             break;
         }
