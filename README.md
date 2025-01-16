@@ -6,7 +6,7 @@ This repository hosts a set of platform independent graph service libraries and 
 
 ## Documentation
 
-To be available soon.
+Refer AudioReach docs [here](https://audioreach.github.io/design/args_design.html)
 
 ## Build instructions
 
