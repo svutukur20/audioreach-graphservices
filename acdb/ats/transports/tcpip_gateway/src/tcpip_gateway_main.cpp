@@ -1,6 +1,6 @@
 /**
 *=============================================================================
-* \file tcpip_gateway_common.h
+* \file tcpip_gateway_main.cpp
 *
 *                        T C P I P  G A T E W A Y  M A I N
 *                               S O U R C E  F I L E
@@ -8,10 +8,9 @@
 * \brief
 *      The main entry point for the Gateway Server application
 *
-* \cond
+* \copyright
 *  Copyright (c) Qualcomm Innovation Center, Inc. All rights reserved.
 *  SPDX-License-Identifier: BSD-3-Clause
-* \endcond
 *=============================================================================
 */
 #include <string>

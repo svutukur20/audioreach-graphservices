@@ -180,7 +180,7 @@ typedef struct _acdb_heap_request_t
     uint32_t subgraph_id;
     uint32_t module_iid;
     uint32_t param_id;
-    uint32_t blob_offset; 
+    uint32_t blob_offset;
     AcdbBlob* blob;
     bool_t is_offloaded_param;
     bool_t should_write_iid_pid;
@@ -251,10 +251,10 @@ bool_t DoesSubgraphContainModule(uint32_t subgraph_id, uint32_t module_iid, int3
 
 /**
 * \brief
-*		Retrieves the processor domain ID that a module is associated with. 
+*		Retrieves the processor domain ID that a module is associated with.
 *       The caller should already know that the module instance belongs to the subgraph.
-* \param[in] subgraph_proc_domain_map: a map containing associations between a subgraphs, the 
-*                                      modules in the subgraph and the processors domains that the 
+* \param[in] subgraph_proc_domain_map: a map containing associations between a subgraphs, the
+*                                      modules in the subgraph and the processors domains that the
 *                                      modules run under
 * \param[in] module_iid: the instance id of the module
 * \param[out] proc_domain_id: the processor domain id returned
@@ -266,8 +266,8 @@ int32_t DataProcGetProcDomainForModule(AcdbSubgraphPdmMap* subgraph_proc_domain_
 /**
 * \brief
 * Retrieve a map containing associations between:
-*       1. a subgraph, 
-*       2. the modules in the subgraph and 
+*       1. a subgraph,
+*       2. the modules in the subgraph and
 *       3. the processors domains that the modules run under
 *
 * \param[in] subgraph_id: The subgraph to retrieve the map for

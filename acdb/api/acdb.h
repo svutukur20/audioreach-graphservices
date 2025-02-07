@@ -2229,7 +2229,7 @@ struct _acdb_get_proc_tagged_modules_rsp_t {
 	uint32_t num_procs;
 	/**< size of the proc_tagged_module_list */
 	uint32_t list_size;
-	/**< A pointer to contiguous block of memory 
+	/**< A pointer to contiguous block of memory
 	containing tagged module ID and IID ordered by processor domain */
 	AcdbProcTaggedModules *proc_tagged_module_list;
 }
