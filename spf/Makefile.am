@@ -63,6 +63,8 @@ spf_sources = ./api/apm/apm_api.h \
                 ./api/modules/data_marker_api.h \
                 ./api/modules/detection_cmn_api.h \
                 ./api/modules/display_port_api.h \
+                ./api/modules/dls_api.h \
+                ./api/modules/dls_log_pkt_hdr_api.h \
                 ./api/modules/dtmf_detection_api.h \
                 ./api/modules/flac_decoder_api.h \
                 ./api/modules/fluence_ffv_common_calibration.h \
