@@ -91,6 +91,12 @@ if USES_ATS_TRANSPORT_TCPIP
 libar_ats_la_CFLAGS += -DATS_TRANSPORT_TCPIP
 libar_ats_la_CPPFLAGS += -DATS_TRANSPORT_TCPIP
 endif
+
+#if USES_ATS_DATA_LOGGING
+libar_ats_la_CFLAGS += -DATS_DATA_LOGGING
+libar_ats_la_CPPFLAGS += -DATS_DATA_LOGGING
+#endif
+
 libar_ats_la_LDFLAGS = -shared -avoid-version
 
 AM_CPPFLAGS += -DSOCK_PATH='"/usr/bin/gateway/ats_sockets"' \
@@ -118,3 +124,8 @@ ats_gateway_CC = @CC@
 ats_gateway_SOURCES = $(gateway_sources)
 ats_gateway_LDADD = $(top_builddir)/ar_osal/libar-osal.la
 ats_gateway_CPPFLAGS = $(AM_CPPFLAGS)
+
+#if USES_ATS_DATA_LOGGING
+ats_gateway_CFLAGS = -DATS_DATA_LOGGING
+ats_gateway_CPPFLAGS += -DATS_DATA_LOGGING
+#endif

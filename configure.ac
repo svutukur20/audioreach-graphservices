@@ -97,6 +97,12 @@ AC_ARG_WITH([are_on_apps],
     [with_are_on_apps=no])
 AM_CONDITIONAL([USE_ARE_ON_APPS], [test "x${with_are_on_apps}" = "xyes"])
 
+AC_ARG_WITH([ats_data_logging],
+    AS_HELP_STRING([Use ATS data logging using Data Logging Service(DLS) (default is yes)]),
+     [with_ats_data_logging=$withval],
+     [with_ats_data_logging=yes])
+AM_CONDITIONAL([USES_ATS_DATA_LOGGING], [test "x${with_ats_data_logging}" = "xyes"])
+
 AC_CONFIG_FILES(
 Makefile
 spf/Makefile
