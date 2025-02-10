@@ -16,7 +16,8 @@ AM_CFLAGS += -I$(top_srcdir)/ar_osal/api \
              -I$(top_srcdir)/acdb/api \
              -I$(top_srcdir)/acdb/inc \
              -I$(top_srcdir)/gsl/api \
-             -I$(top_srcdir)/gsl/rtc_api
+             -I$(top_srcdir)/gsl/rtc_api \
+             -I$(top_srcdir)/gsl/dls_client_api
 
 
 AM_CFLAGS += -I ${srcdir}/inc \
@@ -34,7 +35,8 @@ AM_CFLAGS += -I ${srcdir}/inc \
              -I ${srcdir}/transports/common/api/ \
              -I ${srcdir}/transports/common/inc/ \
              -I ${srcdir}/transports/tcpip_server/inc/ \
-             -I ${srcdir}/transports/tcpip_server/api/
+             -I ${srcdir}/transports/tcpip_server/api/ \
+             -I ${srcdir}/dls/common/inc
 
 AM_CPPFLAGS = $(AM_CFLAGS)
 
@@ -54,9 +56,9 @@ ats_c_sources = ./src/ats.c \
                 ./sockets/linux/src/ar_sockets.cpp \
                 ./transports/common/src/ats_transport.c \
                 ./transports/tcpip_server/src/tcpip_cmd_server.cpp \
-                ./transports/tcpip_server/src/tcpip_rtm_server.cpp \
-                ./transports/tcpip_server/src/tcpip_socket_util.cpp
-
+                ./transports/tcpip_server/src/tcpip_dls_server.cpp \
+                ./transports/tcpip_server/src/tcpip_socket_util.cpp \
+                ./dls/common/src/ats_dls.c
 
 #Includes
 lib_includedir = $(includedir)
@@ -107,6 +109,8 @@ endif
 
 gateway_sources = ./transports/tcpip_gateway/src/tcpip_gateway_main.cpp \
                   ./transports/tcpip_gateway/src/tcpip_gateway_cmd_server.cpp \
+                  ./transports/tcpip_gateway/src/tcpip_gateway_dls_server.cpp \
+                  ./transports/tcpip_gateway/src/tcpip_gateway_socket_util.cpp \
                   ./sockets/linux/src/ar_sockets.cpp
 
 bin_PROGRAMS = ats_gateway
