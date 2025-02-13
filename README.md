@@ -10,7 +10,8 @@ Refer AudioReach docs [here](https://audioreach.github.io/design/args_design.htm
 
 ## Build instructions
 
-Graph service repository supports various build systems: Android, Autotools. CMake is work in progress. Instructions to use Graph service on OpenEmbedded system will be updated soon.
+Graph service repository supports various build systems: Android, Autotools. CMake is work in progress.
+Refer meta-audioreach [README](https://github.com/Audioreach/meta-audioreach?tab=readme-ov-file#openembedded-build--development-process) for instructions to use Graph Service on OpenEmbedded system.
 
 ## License
 
