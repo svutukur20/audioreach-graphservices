@@ -31,7 +31,7 @@
 * Preprocessor Definitions and Constants
 *--------------------------------------------------------------------------- */
 #define ACDB_SOFTWARE_VERSION_MAJOR 0x00000001
-#define ACDB_SOFTWARE_VERSION_MINOR 0x00000028
+#define ACDB_SOFTWARE_VERSION_MINOR 0x00000029
 #define ACDB_SOFTWARE_VERSION_REVISION 0x00000000
 #define ACDB_SOFTWARE_VERSION_CPLINFO 0x00000000
 
@@ -7153,6 +7153,7 @@ int32_t GetVcpmOffloadedData(
     bool_t should_skip_param = FALSE;
     AcdbMiidPidPair id_pair = { 0 };
     AcdbVcpmParamInfo param_info = { 0 };
+    AcdbUintList datapool_offset_list = { 0 };
     AcdbVcpmOffloadedParamInfo *offloaded_param_info = NULL;
     if (IsNull(vcpm_info) || IsNull(rsp))
     {
@@ -7172,6 +7173,12 @@ int32_t GetVcpmOffloadedData(
         return AR_EBADPARAM;
     }
 
+    //keep track of data offsets
+    uint32_t offset_list_index = 0;
+    datapool_offset_list.count = vcpm_info->offloaded_param_info_list.length;
+    datapool_offset_list.list = (uint32_t*)ACDB_MALLOC(AcdbCalDefDataPoolPair, datapool_offset_list.count);
+    ar_mem_set(datapool_offset_list.list, 0, sizeof(AcdbCalDefDataPoolPair) * datapool_offset_list.count);
+
     vcpm_info->ignore_iid_list_update = TRUE;
 
     do
@@ -7179,25 +7186,52 @@ int32_t GetVcpmOffloadedData(
         offloaded_param_info =
             (AcdbVcpmOffloadedParamInfo*)opi_node->p_struct;
 
-        status = GetVcpmModuleParamPair(
-            vcpm_info, &id_pair, NULL, &should_skip_param, &param_info,
-            offloaded_param_info->file_offset_cal_def, rsp, total_cal_size);
-        if (AR_FAILED(status))
+        bool_t should_write_to_data_pool = TRUE;
+        AcdbCalDefDataPoolPair* offset_pair = NULL;
+
+        /* prevent writing the same payload multiple times in the data pool */
+        for (uint32_t i = 0; i < datapool_offset_list.count; i++)
         {
-            return status;
+            offset_pair = (AcdbCalDefDataPoolPair*)datapool_offset_list.list + i;
+            if (offloaded_param_info->file_offset_data_pool == offset_pair->file_offset_data_pool &&
+                offloaded_param_info->file_offset_cal_def == offset_pair->file_offset_cal_def)
+            {
+                should_write_to_data_pool = FALSE;
+                break;
+            }
         }
 
-        if (should_skip_param)
+        if (should_write_to_data_pool)
         {
-            continue;
+            //Add new entry
+            offset_pair = (AcdbCalDefDataPoolPair*)datapool_offset_list.list + offset_list_index;
+            offset_pair->file_offset_cal_def = offloaded_param_info->file_offset_cal_def;
+            offset_pair->file_offset_data_pool = offloaded_param_info->file_offset_data_pool;
+            offset_list_index++;
         }
 
-        offset_data_pool = offloaded_param_info->file_offset_data_pool;
-        status = GetVcpmParamPayload(vcpm_info, &id_pair, &param_info, TRUE,
+        if(should_write_to_data_pool)
+        {
+            status = GetVcpmModuleParamPair(
+                vcpm_info, &id_pair, NULL, &should_skip_param, &param_info,
+                offloaded_param_info->file_offset_cal_def, rsp, total_cal_size);
+            if (AR_FAILED(status))
+            {
+                goto end;
+            }
+
+            if (should_skip_param)
+            {
+                continue;
+            }
+
+            offset_data_pool = offloaded_param_info->file_offset_data_pool;
+            status = GetVcpmParamPayload(vcpm_info, &id_pair, &param_info, TRUE,
                 offset_data_pool, rsp);
-        if (AR_FAILED(status))
-        {
-            return status;
+            if (AR_FAILED(status))
+            {
+                goto end;
+            }
         }
 
         /* Update Param Info for offloaded param in the VCPM Subgraph
@@ -7214,6 +7248,8 @@ int32_t GetVcpmOffloadedData(
 
     } while (TRUE != AcdbListSetNext(&opi_node));
 
+end:
+    ACDB_FREE(datapool_offset_list.list);
     return status;
 }
 

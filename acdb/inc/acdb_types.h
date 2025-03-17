@@ -441,6 +441,15 @@ struct _acdb_vcpm_offloaded_param_info_t
     uint32_t blob_offset_vcpm_param_info;
 };
 
+typedef struct _acdb_cal_def_data_pool_offset_pair_t AcdbCalDefDataPoolPair;
+struct _acdb_cal_def_data_pool_offset_pair_t
+{
+    /**< File offset to the <IID, PID> pair in the VCPM Cal DEF Chunk */
+    uint32_t file_offset_cal_def;
+    /**< File offset to the parameters payload in the Global Datapool Chunk */
+    uint32_t file_offset_data_pool;
+};
+
 typedef struct _acdb_vcpm_blob_info_t AcdbVcpmBlobInfo;
 struct _acdb_vcpm_blob_info_t
 {
@@ -784,21 +793,21 @@ typedef int32_t(*ACDB_GENERIC_LIST_ADD)(
 /**
 * \brief ACDB_GENERIC_LIST_FIND
 *		Searches for an element in a AcdbGenericList
-*       each 
+*       each
 * \param [in] list: pointer to a AcdbGenericList type
-* \param [in] item: the item to search for. The item must be 
-*                   4 bytes or more. If more then its size must be a 
-*                   multiple of 4. This is required by the binary search 
-*                   used in the find function. For example an item 
+* \param [in] item: the item to search for. The item must be
+*                   4 bytes or more. If more then its size must be a
+*                   multiple of 4. This is required by the binary search
+*                   used in the find function. For example an item
 *                   can be a structure with two 4 byte fields
 * \param [in] item_size: the size of the item
-* \param [in] num_search_keys: the number of 4 byte components to use 
+* \param [in] num_search_keys: the number of 4 byte components to use
 *                              for the search
-* \param [out] found_item: the item found in the list containing the 
+* \param [out] found_item: the item found in the list containing the
 *                          index and a pointer to the item
 */
 typedef int32_t(*ACDB_GENERIC_LIST_FIND)(
-    void* list, void* item, uint32_t item_size, 
+    void* list, void* item, uint32_t item_size,
     uint32_t num_search_keys, AcdbGenericListItem* found_item);
 
 /**
@@ -806,8 +815,8 @@ typedef int32_t(*ACDB_GENERIC_LIST_FIND)(
 *		Searches for an element in a AcdbGenericList
 *       each
 * \param [in] list: pointer to a AcdbGenericList type
-* \param [in] key_elem_struct_position: the 4byte key to sort by. Specify the 
-*                                       position of the key within your structure. E.g 
+* \param [in] key_elem_struct_position: the 4byte key to sort by. Specify the
+*                                       position of the key within your structure. E.g
 *           struct _some_struct{
 *               int32_t a; position 0
 *               int32_t b; position 1
