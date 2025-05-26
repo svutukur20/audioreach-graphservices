@@ -33,7 +33,11 @@ struct gsl_dls_client_ctxt dls_client_ctxt;
 
 int32_t gsl_dls_client_is_feature_supported()
 {
+#if defined(ATS_DATA_LOGGING)
     return AR_EOK;
+#else
+    return AR_EUNSUPPORTED;
+#endif
 }
 
 static int32_t gsl_dls_client_register_deregister_commit_log_buffer_event(enum gsl_dls_commit_log_buffer_register_enum_t event_register_flag)
