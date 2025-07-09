@@ -4,9 +4,7 @@ Hi there!
 We’re thrilled that you’d like to contribute to this project.
 Your help is essential for keeping this project great and for making it better.
 
-## Branching Strategy
 
-In general, contributors should develop on branches based off of `master` and pull requests should be made against `master`.
 
 ## Submitting a pull request
 
